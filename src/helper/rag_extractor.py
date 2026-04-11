@@ -121,13 +121,29 @@ def find_url(text, pattern):
     match = re.search(pattern, text)
     return match.group(0) if match else None
 
+def is_real_url(value):
+    """Check if a value is actually a URL not just display text"""
+    if not value:
+        return False
+    return value.strip().startswith("http")
+
 # ─── Individual Link Queries ──────────────────────────────
 
 def query_github_url(collection, resume_data):
-    if resume_data.get("github_url"):
-        print(f"  ✅ GitHub URL from resume: {resume_data['github_url']}")
-        return resume_data["github_url"]
+    raw = resume_data.get("github_url", "")
 
+    # Validate — must be a real URL with github.com and a username
+    if is_real_url(raw) and "github.com/" in raw:
+        username = raw.rstrip("/").split("/")[-1]
+        # Reject if username is empty or the GitHub org itself
+        if username.lower() not in ["github", "github.com", ""]:
+            print(f"  ✅ GitHub URL from resume: {raw}")
+            return raw
+
+    if raw:
+        print(f"  ⚠️  Rejected invalid GitHub value: '{raw}' — not a real URL")
+
+    # Query RAG
     print("  🔍 RAG querying for GitHub URL...")
     results = collection.query(
         query_texts=["github profile link url repository code"],
@@ -140,8 +156,12 @@ def query_github_url(collection, resume_data):
         for doc in docs:
             url = find_url(doc, pattern)
             if url:
-                parts = url.split("/")
-                clean = "/".join(parts[:4])
+                parts    = url.split("/")
+                clean    = "/".join(parts[:4])
+                username = parts[3] if len(parts) > 3 else ""
+                # Reject the GitHub org account
+                if username.lower() in ["github", ""]:
+                    continue
                 print(f"  ✅ RAG found GitHub URL: {clean}")
                 return clean
 
@@ -149,10 +169,17 @@ def query_github_url(collection, resume_data):
     return None
 
 def query_linkedin_url(collection, resume_data):
-    if resume_data.get("linkedin_url"):
-        print(f"  ✅ LinkedIn URL from resume: {resume_data['linkedin_url']}")
-        return resume_data["linkedin_url"]
+    raw = resume_data.get("linkedin_url", "")
 
+    # Validate — must be a real URL with linkedin.com/in/
+    if is_real_url(raw) and "linkedin.com/in/" in raw:
+        print(f"  ✅ LinkedIn URL from resume: {raw}")
+        return raw
+
+    if raw:
+        print(f"  ⚠️  Rejected invalid LinkedIn value: '{raw}' — not a real URL")
+
+    # Query RAG
     print("  🔍 RAG querying for LinkedIn URL...")
     results = collection.query(
         query_texts=["linkedin profile link professional network"],
@@ -172,10 +199,21 @@ def query_linkedin_url(collection, resume_data):
     return None
 
 def query_portfolio_url(collection, resume_data):
-    if resume_data.get("portfolio_url"):
-        print(f"  ✅ Portfolio URL from resume: {resume_data['portfolio_url']}")
-        return resume_data["portfolio_url"]
+    raw = resume_data.get("portfolio_url", "")
 
+    # Validate — must be a real URL, not github or linkedin
+    if (
+        is_real_url(raw) and
+        "github.com" not in raw and
+        "linkedin.com" not in raw
+    ):
+        print(f"  ✅ Portfolio URL from resume: {raw}")
+        return raw
+
+    if raw:
+        print(f"  ⚠️  Rejected invalid portfolio value: '{raw}' — not a real URL")
+
+    # Query RAG
     print("  🔍 RAG querying for portfolio URL...")
     results = collection.query(
         query_texts=["personal website portfolio link url showcase"],
@@ -214,7 +252,7 @@ def extract_portfolio_from_github(github_data):
     print("  🔍 Checking GitHub for portfolio link...")
 
     # Check profile website field
-    if github_data.get("website"):
+    if github_data.get("website") and is_real_url(github_data["website"]):
         print(f"  ✅ Found in GitHub profile website: {github_data['website']}")
         return github_data["website"]
 
@@ -230,7 +268,7 @@ def extract_portfolio_from_github(github_data):
     for repo in github_data.get("repositories", []):
         if repo.get("has_live_demo"):
             homepage = repo.get("homepage", "")
-            if homepage:
+            if homepage and is_real_url(homepage):
                 print(f"  ✅ Found live demo in repo '{repo['name']}': {homepage}")
                 return homepage
 
@@ -242,7 +280,8 @@ def extract_portfolio_from_github(github_data):
 def extract_links_with_rag(resume_data, github_data=None):
     """
     Priority order:
-    1. Check resume data directly (Gemini extracted)
+    1. Check resume data directly (Gemini extracted + hyperlinks)
+       — validated to be real URLs not display text
     2. Query RAG vector store semantically
     3. For portfolio only: fallback to GitHub repos
     """

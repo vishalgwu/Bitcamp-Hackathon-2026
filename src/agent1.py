@@ -11,7 +11,7 @@ load_dotenv()
 sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 
 from helper.resume_parser     import parse_resume
-from helper.github_scraper    import scrape_github
+from helper.github_scraper    import scrape_github, get_profile
 from helper.portfolio_scraper import scrape_portfolio
 from helper.rag_extractor     import (
     build_vectorstore,
@@ -30,9 +30,7 @@ def merge_profiles(resume_data, github_data, portfolio_data):
     portfolio_skills = portfolio_data.get(
         "structured", {}
     ).get("skills", [])
-
-    # Merge skills from code analysis too
-    code_skills = github_data.get(
+    code_skills      = github_data.get(
         "code_analysis", {}
     ).get("skills_from_code", [])
 
@@ -45,21 +43,21 @@ def merge_profiles(resume_data, github_data, portfolio_data):
 
     github_repos = [
         {
-            "name":           repo["name"],
-            "description":    repo.get("description", ""),
-            "technologies":   repo.get("languages", []),
-            "source":         "github",
-            "stars":          repo.get("stars", 0),
-            "forks":          repo.get("forks", 0),
-            "commit_count":   repo.get("commit_count", 0),
-            "last_updated":   repo.get("last_updated", ""),
-            "readme":         repo.get("readme_preview", ""),
-            "topics":         repo.get("topics", []),
-            "has_live_demo":  repo.get("has_live_demo", False),
-            "homepage":       repo.get("homepage", ""),
-            "is_fork":        repo.get("is_fork", False),
-            "code_samples":   repo.get("code_samples", {}),
-            "code_insights":  repo.get("code_insights", {})
+            "name":          repo["name"],
+            "description":   repo.get("description", ""),
+            "technologies":  repo.get("languages", []),
+            "source":        "github",
+            "stars":         repo.get("stars", 0),
+            "forks":         repo.get("forks", 0),
+            "commit_count":  repo.get("commit_count", 0),
+            "last_updated":  repo.get("last_updated", ""),
+            "readme":        repo.get("readme_preview", ""),
+            "topics":        repo.get("topics", []),
+            "has_live_demo": repo.get("has_live_demo", False),
+            "homepage":      repo.get("homepage", ""),
+            "is_fork":       repo.get("is_fork", False),
+            "code_samples":  repo.get("code_samples", {}),
+            "code_insights": repo.get("code_insights", {})
         }
         for repo in github_data.get("repositories", [])
     ]
@@ -108,7 +106,12 @@ def merge_profiles(resume_data, github_data, portfolio_data):
             "github_url":   github_data.get("github_url"),
             "top_repos":    github_data.get("top_repos", [])
         },
-        "code_analysis": github_data.get("code_analysis", {}),
+        "code_analysis": github_data.get("code_analysis", {
+            "repos_analyzed":        0,
+            "skills_from_code":      [],
+            "architecture_patterns": [],
+            "best_practices":        []
+        }),
         "portfolio": {
             "url":        portfolio_data.get("url"),
             "headings":   portfolio_data.get("headings", []),
@@ -120,9 +123,12 @@ def merge_profiles(resume_data, github_data, portfolio_data):
             "linkedin":  resume_data.get("linkedin_url")
         },
         "sources_used": {
-            "resume":    bool(resume_data),
-            "github":    bool(github_data),
-            "portfolio": bool(portfolio_data)
+            "resume":        bool(resume_data),
+            "github":        bool(github_data),
+            "portfolio":     bool(portfolio_data),
+            "code_analysis": github_data.get(
+                "code_analysis", {}
+            ).get("repos_analyzed", 0) > 0
         }
     }
 
@@ -155,17 +161,17 @@ def print_summary(unified_profile, portfolio_url):
     port_skills = unified_profile['skills']['from_portfolio']
     print(f"  From portfolio : {', '.join(port_skills) if port_skills else 'None'}")
     code_skills = unified_profile['skills']['from_code']
-    print(f"  From code      : {', '.join(code_skills) if code_skills else 'None'}")
+    print(f"  From code      : {', '.join(code_skills) if code_skills else 'None (no code analysis run)'}")
 
     # ── Experience ────────────────────────────────────────
     print("\n💼 EXPERIENCE")
     for exp in unified_profile.get("experience", []):
         print(f"  ┌─────────────────────────────────────────────────")
-        print(f"  │ Role     : {exp.get('role')}")
-        print(f"  │ Company  : {exp.get('company')}")
-        print(f"  │ Duration : {exp.get('duration')}")
-        print(f"  │ Location : {exp.get('location', 'N/A')}")
-        print(f"  │ Description:")
+        print(f"  │ Role        : {exp.get('role')}")
+        print(f"  │ Company     : {exp.get('company')}")
+        print(f"  │ Duration    : {exp.get('duration')}")
+        print(f"  │ Location    : {exp.get('location', 'N/A')}")
+        print(f"  │ Description :")
         desc = exp.get('description', 'N/A')
         for line in desc.split("\n"):
             line = line.strip()
@@ -185,8 +191,12 @@ def print_summary(unified_profile, portfolio_url):
 
     # ── Certifications ────────────────────────────────────
     print("\n📜 CERTIFICATIONS")
-    for cert in unified_profile.get("certifications", []):
-        print(f"  • {cert}")
+    certs = unified_profile.get("certifications", [])
+    if certs:
+        for cert in certs:
+            print(f"  • {cert}")
+    else:
+        print("  None")
 
     # ── Projects from Resume ──────────────────────────────
     print("\n📁 PROJECTS FROM RESUME")
@@ -254,22 +264,33 @@ def print_summary(unified_profile, portfolio_url):
         print(f"    Has Demo     : {repo.get('has_live_demo', False)}")
 
     # ── Code Analysis ─────────────────────────────────────
-    code_analysis = unified_profile.get("code_analysis", {})
-    if code_analysis and code_analysis.get("repos_analyzed", 0) > 0:
-        print("\n🔍 CODE ANALYSIS INSIGHTS")
-        print(f"  Repos analyzed       : {code_analysis.get('repos_analyzed', 0)}")
+    code_analysis  = unified_profile.get("code_analysis", {})
+    repos_analyzed = code_analysis.get("repos_analyzed", 0)
+
+    print("\n🔍 CODE ANALYSIS")
+    if repos_analyzed == 0:
+        print("  ⚠️  No code analysis was run")
+        print("  (Run agent1.py again and choose 'y' for code analysis)")
+    else:
+        print(f"  Repos analyzed       : {repos_analyzed}")
 
         skills_from_code = code_analysis.get("skills_from_code", [])
         if skills_from_code:
-            print(f"  Skills from code     : {', '.join(skills_from_code)}")
+            print(f"  Skills from code     :")
+            for s in skills_from_code:
+                print(f"    • {s}")
 
         patterns = code_analysis.get("architecture_patterns", [])
         if patterns:
-            print(f"  Architecture patterns: {', '.join(patterns)}")
+            print(f"  Architecture patterns:")
+            for p in patterns:
+                print(f"    • {p}")
 
         best_practices = code_analysis.get("best_practices", [])
         if best_practices:
-            print(f"  Best practices       : {', '.join(best_practices)}")
+            print(f"  Best practices       :")
+            for b in best_practices:
+                print(f"    • {b}")
 
         # Per repo insights
         print("\n  Per Repo Code Insights:")
@@ -282,41 +303,46 @@ def print_summary(unified_profile, portfolio_url):
             tc = insights.get("technical_complexity", {})
 
             print(f"  ┌─────────────────────────────────────────────────")
-            print(f"  │ Repo             : {repo['name']}")
-            print(f"  │ Code Quality     : {cq.get('rating', 'N/A')} ({cq.get('score', 'N/A')}/10)")
-            print(f"  │ Quality Summary  : {cq.get('summary', 'N/A')}")
-            print(f"  │ Complexity       : {tc.get('rating', 'N/A')} ({tc.get('score', 'N/A')}/10)")
+            print(f"  │ Repo              : {repo['name']}")
+            print(f"  │ Code Quality      : {cq.get('rating', 'N/A')} ({cq.get('score', 'N/A')}/10)")
+            print(f"  │ Quality Summary   : {cq.get('summary', 'N/A')}")
+            print(f"  │ Complexity        : {tc.get('rating', 'N/A')} ({tc.get('score', 'N/A')}/10)")
             print(f"  │ Complexity Summary: {tc.get('summary', 'N/A')}")
-            print(f"  │ Overall          : {insights.get('overall_assessment', 'N/A')}")
+            print(f"  │ Overall           : {insights.get('overall_assessment', 'N/A')}")
 
             skills = insights.get("skills_demonstrated", [])
             if skills:
-                print(f"  │ Skills shown     : {', '.join(skills)}")
+                print(f"  │ Skills shown      :")
+                for s in skills:
+                    print(f"  │   • {s}")
 
             arch = insights.get("architecture_patterns", [])
             if arch:
-                print(f"  │ Patterns         : {', '.join(arch)}")
+                print(f"  │ Patterns          :")
+                for a in arch:
+                    print(f"  │   • {a}")
 
             bp = insights.get("best_practices_used", [])
             if bp:
-                print(f"  │ Best practices   : {', '.join(bp)}")
+                print(f"  │ Best practices    :")
+                for b in bp:
+                    print(f"  │   • {b}")
 
             improvements = insights.get("areas_for_improvement", [])
             if improvements:
-                print(f"  │ Improvements     :")
+                print(f"  │ Improvements      :")
                 for item in improvements:
                     print(f"  │   • {item}")
 
             observations = insights.get("notable_observations", [])
             if observations:
-                print(f"  │ Observations     :")
+                print(f"  │ Observations      :")
                 for obs in observations:
                     print(f"  │   • {obs}")
 
-            # Code samples preview
             samples = repo.get("code_samples", {})
             if samples:
-                print(f"  │ Code Files analyzed:")
+                print(f"  │ Code files analyzed:")
                 for path in samples.keys():
                     print(f"  │   • {path}")
 
@@ -330,8 +356,7 @@ def print_summary(unified_profile, portfolio_url):
         if structured:
             print(f"  Name   : {structured.get('name', 'N/A')}")
             print(f"  Title  : {structured.get('title', 'N/A')}")
-            about = structured.get('about', 'N/A')
-            print(f"  About  : {about}")
+            print(f"  About  : {structured.get('about', 'N/A')}")
             port_skills = structured.get("skills", [])
             if port_skills:
                 print(f"  Skills : {', '.join(port_skills)}")
@@ -371,10 +396,10 @@ def print_summary(unified_profile, portfolio_url):
 
     # ── Links ─────────────────────────────────────────────
     print("\n🔗 LINKS")
-    print(f"  Email     : {unified_profile['candidate'].get('email') or 'Not found'}")
-    print(f"  GitHub    : {unified_profile['links'].get('github')    or 'Not found'}")
-    print(f"  Portfolio : {unified_profile['links'].get('portfolio') or 'Not found'}")
-    print(f"  LinkedIn  : {unified_profile['links'].get('linkedin')  or 'Not found'}")
+    print(f"  Email     : {unified_profile['candidate'].get('email')    or 'Not found'}")
+    print(f"  GitHub    : {unified_profile['links'].get('github')       or 'Not found'}")
+    print(f"  Portfolio : {unified_profile['links'].get('portfolio')    or 'Not found'}")
+    print(f"  LinkedIn  : {unified_profile['links'].get('linkedin')     or 'Not found'}")
 
     print("\n" + "=" * 55)
     print("  ✅ Saved → outputs/candidate_profile.json")
@@ -429,44 +454,69 @@ def run_agent1():
 
     print(f"\n  ✅ Resume parsed: {resume_data.get('name')}")
 
-    # ── Step 2: Build RAG + Extract GitHub URL ────────────
+    # ── Step 2: Build RAG + Extract Links ─────────────────
     print("\n🔍 STEP 2: Building RAG vector store...")
     collection   = build_vectorstore(resume_data)
     github_url   = query_github_url(collection, resume_data)
     linkedin_url = query_linkedin_url(collection, resume_data)
 
-    # Let user override GitHub URL
-    github_input = input(
-        f"\n  GitHub URL [{github_url or 'not found'}]: "
-    ).strip()
+    # GitHub URL — auto detected or manual input
+    if github_url:
+        print(f"\n  ✅ GitHub URL detected: {github_url}")
+        github_input = input(
+            "  Press Enter to use this or paste the correct one: "
+        ).strip()
+    else:
+        print("\n  ⚠️  No GitHub URL found automatically")
+        print("  (This happens when resume is pasted as text or links are hyperlinked)")
+        github_input = input(
+            "  Paste GitHub URL (e.g. https://github.com/username) or Enter to skip: "
+        ).strip()
+
     if github_input:
         github_url = github_input
 
     # ── Step 3: Scrape GitHub + Analyze Code ─────────────
     print("\n🐙 STEP 3: GitHub Sub-Agent")
     github_data = {}
+
     if github_url:
-        # Ask if user wants code analysis
-        analyze = input(
-            "\n  Run code analysis on repos? (y/n) [y]: "
-        ).strip().lower()
-        analyze_code = analyze != "n"
+        # Safety check for large org accounts
+        username     = github_url.rstrip("/").split("/")[-1]
+        _profile     = get_profile(username)
+        public_repos = _profile.get("public_repos", 0)
 
-        max_repos = 3
-        if analyze_code:
-            max_input = input(
-                "  How many repos to analyze? (1-5) [3]: "
-            ).strip()
-            if max_input.isdigit():
-                max_repos = max(1, min(5, int(max_input)))
+        if public_repos > 200:
+            print(f"\n  ⚠️  This account has {public_repos} repos — looks like an org not a person")
+            confirm = input(
+                "  Are you sure this is the right GitHub URL? (y/n): "
+            ).strip().lower()
+            if confirm != "y":
+                print("  Skipping GitHub scraping.")
+                github_url  = None
+                github_data = {}
 
-        github_data = scrape_github(
-            github_url,
-            analyze_code=analyze_code,
-            max_repos_to_analyze=max_repos
-        )
+        if github_url:
+            analyze = input(
+                "\n  Run code analysis on repos? (y/n) [y]: "
+            ).strip().lower()
+            analyze_code = analyze != "n"
+
+            max_repos = 3
+            if analyze_code:
+                max_input = input(
+                    "  How many repos to analyze? (1-5) [3]: "
+                ).strip()
+                if max_input.isdigit():
+                    max_repos = max(1, min(5, int(max_input)))
+
+            github_data = scrape_github(
+                github_url,
+                analyze_code=analyze_code,
+                max_repos_to_analyze=max_repos
+            )
     else:
-        print("  ⚠️  No GitHub URL — skipping")
+        print("  ⚠️  No GitHub URL — skipping GitHub scraping")
 
     # ── Step 4: Find Portfolio ────────────────────────────
     print("\n🔍 STEP 4: Finding Portfolio URL...")
@@ -476,10 +526,19 @@ def run_agent1():
         print("  Not found in resume — checking GitHub repos...")
         portfolio_url = extract_portfolio_from_github(github_data)
 
-    # Let user override
-    portfolio_input = input(
-        f"\n  Portfolio URL [{portfolio_url or 'not found'}]: "
-    ).strip()
+    # Portfolio URL — auto detected or manual input
+    if portfolio_url:
+        print(f"\n  ✅ Portfolio URL detected: {portfolio_url}")
+        portfolio_input = input(
+            "  Press Enter to use this or paste the correct one: "
+        ).strip()
+    else:
+        print("\n  ⚠️  No Portfolio URL found automatically")
+        print("  (This happens when resume is pasted as text or links are hyperlinked)")
+        portfolio_input = input(
+            "  Paste Portfolio URL or Enter to skip: "
+        ).strip()
+
     if portfolio_input:
         portfolio_url = portfolio_input
 

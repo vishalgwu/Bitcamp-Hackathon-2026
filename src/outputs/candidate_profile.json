@@ -1,265 +1,340 @@
 {
   "candidate": {
-    "name": "SIDDHARTH SARAVANAN",
-    "email": "siddharthsaravanan27@gmail.com",
-    "phone": "+1(202) 743-9829",
-    "location": "Washington, DC",
-    "summary": "Siddharth Saravanan is a Master's student in Data Science with a strong background in software engineering and data analytics. He leverages expertise in Python, R, AWS, SQL, and machine learning frameworks to develop innovative solutions, as demonstrated in projects ranging from multi-agent systems to environmental data analysis. His professional experience includes roles at George Washington University, Pantech Prolabs, and Accenture, where he applied analytical skills to drive process improvements and deliver key insights."
+    "name": "Aniruddh Rajagopal",
+    "email": "aniruddhrajagopal9@gmail.com",
+    "phone": "+1(202)713-4178",
+    "location": "Washington DC",
+    "summary": "ML Engineer with 5+ years of experience in NLP, computer vision, and GenAI, skilled in building scalable pipelines and deploying models on cloud platforms. Currently pursuing an MS in Data Science at GWU, with a proven track record in leading teams and improving engagement through recommendation engines and NLP systems."
   },
   "skills": {
     "all": [
-      "machine learning",
-      "mysql",
-      "multi-tasking",
-      "jupyter",
-      "python",
-      "hack",
-      "power bi",
-      "google cloud",
-      "ai",
-      "javascript (jquery) for dom manipulation and ui enhancements",
-      "experimentation and iterative development (implied by multiple classification approaches)",
-      "html/css integration (implied)",
-      "tableau",
-      "scikit-learn",
-      "jupyter notebook",
-      "pandas",
-      "data handling and cleaning (pandas for excel/csv, fillna, column operations)",
-      "basic database interaction (mysqli or pdo object usage, mysqli_real_escape_string)",
-      "basic session management",
-      "google colab",
-      "seaborn",
-      "traditional machine learning (scikit-learn, tf-idf, logistic regression, model evaluation)",
-      "session management",
-      "basic error handling with try-catch blocks",
-      "software engineering fundamentals (basic error handling, modularity, file system operations)",
-      "html5 structure and meta-tags",
-      "basic sql queries (insert, select)",
-      "file uploads (basic implementation)",
-      "form handling and validation (basic)",
-      "javascript",
-      "matplotlib",
-      "pyspark",
-      "html",
-      "integration of third-party jquery plugins (meanmenu, tooltips, sticky, nicescroll, jquery validate)",
-      "pycharm",
-      "anaconda",
-      "mobile development",
-      "mongodb",
-      "statsmodels",
-      "analytical skills",
-      "excel",
-      "natural language processing (text preprocessing, regex, tf-idf, sentence embeddings, transformer models)",
-      "r",
-      "canva",
-      "handling http post requests and form data",
-      "sql query writing (select, update, aggregate functions like count, sum, case)",
-      "vs code",
-      "aws",
-      "php",
-      "scala",
-      "pdo for database interaction (mysql/mariadb)",
-      "technical aptitude",
+      "spacy",
+      "plotly",
+      "model deployment",
+      "understanding of basic web application structure.",
       "git",
-      "basic php syntax and control structures (if/else, isset)",
-      "python programming (scripting, data manipulation)",
-      "deep learning fundamentals (pytorch for model inference, hugging face transformers for fine-tuning)",
-      "model persistence and loading (joblib)",
+      "jupyter notebook",
+      "jupyter",
+      "machine learning (naive bayes)",
+      "python programming",
+      "matplotlib",
+      "pytorch",
+      "deep learning",
+      "pickle",
+      "python programming fundamentals (variables, dictionaries, file i/o).",
+      "deployment concepts (model loading, device management)",
+      "predictive modeling",
+      "langchain",
+      "natural language processing (nlp)",
+      "hugging face transformers",
+      "error handling (conditional imports)",
+      "vscode",
+      "api integration",
+      "sagemaker",
+      "llm pipelines",
+      "streamlit (for ml-model.py)",
+      "model development & optimization",
+      "torchvision",
+      "flask (for app.py)",
+      "github",
+      "tensorflow (implied if used for training)",
+      "html",
+      "mysql",
+      "tableau",
+      "amplify",
+      "basic flask web framework usage (app initialization, importing modules).",
+      "environment variable management",
+      "relational & nosql databases",
+      "docker",
+      "s3",
+      "algorithm implementation",
+      "aws lambda",
+      "secrets management (.streamlit/secrets.toml)",
       "numpy",
-      "oops",
-      "java",
-      "php (procedural programming)",
+      "ibm watsonx ai (llm integration)",
+      "aws s3",
+      "aws",
+      "python",
+      "sentiment analysis",
+      "tensorflow",
+      "feature engineering",
+      "lambda",
+      "regular expressions",
+      "real-time inference",
+      "api gateway",
+      "iam",
+      "sql",
+      "machine learning model serialization/deserialization using `pickle`.",
+      "web development (basic html/js for app.py)",
+      "data pipelines",
+      "opencv",
+      "data preprocessing",
+      "streamlit (web application framework)",
+      "scikit-learn",
+      "streamlit",
+      "nlp",
+      "multi-agent systems",
+      "mongodb",
+      "retrieval augmented generation (rag)",
+      "computer vision",
+      "scalable architecture",
+      "mongodb (database integration)",
+      "text preprocessing",
+      "flask",
+      "pandas",
       "css",
-      "strong password hashing and verification (password_hash, password_verify)",
-      "web development",
-      "shell",
-      "css framework integration (bootstrap)"
+      "explainable ai (shap, lime, grad-cam)",
+      "image processing (pil)",
+      "fastapi",
+      "elasticsearch",
+      "power bi",
+      "nltk"
     ],
     "from_resume": [
       "Python",
-      "R",
+      "NumPy",
+      "Pandas",
+      "Scikit-learn",
+      "PyTorch",
+      "TensorFlow",
+      "OpenCV",
+      "spaCy",
+      "NLTK",
+      "SQL",
+      "FastAPI",
+      "Flask",
+      "Streamlit",
+      "Deep Learning",
+      "Computer Vision",
+      "NLP",
+      "LLM Pipelines",
+      "Multi-Agent Systems",
+      "Hugging Face Transformers",
+      "Model Development & Optimization",
+      "Explainable AI (SHAP, LIME, Grad-CAM)",
+      "LangChain",
+      "Predictive Modeling",
+      "Retrieval Augmented Generation (RAG)",
       "AWS",
-      "Google Cloud",
-      "Java",
-      "JavaScript",
-      "HTML",
-      "CSS",
-      "PySpark",
+      "SageMaker",
+      "Lambda",
+      "API Gateway",
+      "Amplify",
+      "S3",
+      "IAM",
+      "Model Deployment",
+      "Real-time Inference",
+      "Scalable Architecture",
+      "Relational & NoSQL Databases",
       "MySQL",
       "MongoDB",
+      "Elasticsearch",
+      "Data Pipelines",
+      "Feature Engineering",
+      "Git",
+      "GitHub",
+      "Docker",
+      "VSCode",
+      "Jupyter",
       "Power BI",
       "Tableau",
-      "Excel",
-      "Canva",
-      "Git",
-      "Anaconda",
-      "VS Code",
-      "Jupyter",
-      "PyCharm",
-      "Google Colab",
-      "scikit-learn",
-      "pandas",
-      "NumPy",
-      "matplotlib",
-      "seaborn",
-      "statsmodels",
-      "Analytical Skills",
-      "Technical Aptitude",
-      "Multi-tasking",
-      "OOPs",
-      "AI",
-      "Machine Learning",
-      "Web Development",
-      "Mobile Development"
+      "Plotly",
+      "Matplotlib"
     ],
     "from_github": [
-      "JavaScript",
       "HTML",
-      "Scala",
-      "Jupyter Notebook",
-      "Hack",
       "CSS",
-      "PHP",
       "Python",
-      "Shell"
+      "Jupyter Notebook"
     ],
     "from_portfolio": [],
     "from_code": [
-      "CSS framework integration (Bootstrap)",
-      "Basic SQL queries (INSERT, SELECT)",
-      "File Uploads (basic implementation)",
-      "HTML/CSS integration (implied)",
-      "Traditional Machine Learning (Scikit-learn, TF-IDF, Logistic Regression, model evaluation)",
-      "Session Management",
-      "JavaScript (jQuery) for DOM manipulation and UI enhancements",
-      "Handling HTTP POST requests and form data",
-      "PHP (procedural programming)",
-      "PDO for database interaction (MySQL/MariaDB)",
-      "Data Handling and Cleaning (Pandas for Excel/CSV, fillna, column operations)",
-      "Natural Language Processing (Text preprocessing, regex, TF-IDF, sentence embeddings, Transformer models)",
-      "Basic PHP syntax and control structures (if/else, isset)",
-      "SQL query writing (SELECT, UPDATE, Aggregate Functions like COUNT, SUM, CASE)",
-      "Integration of third-party jQuery plugins (meanmenu, tooltips, sticky, NiceScroll, jQuery Validate)",
-      "Form Handling and Validation (basic)",
-      "Strong Password Hashing and Verification (password_hash, password_verify)",
-      "Basic error handling with try-catch blocks",
-      "Deep Learning Fundamentals (PyTorch for model inference, Hugging Face Transformers for fine-tuning)",
-      "Basic database interaction (mysqli or PDO object usage, mysqli_real_escape_string)",
-      "Python Programming (scripting, data manipulation)",
-      "Software Engineering Fundamentals (basic error handling, modularity, file system operations)",
-      "Basic session management",
-      "Experimentation and Iterative Development (implied by multiple classification approaches)",
-      "Model Persistence and Loading (joblib)",
-      "HTML5 structure and meta-tags"
+      "Data Preprocessing",
+      "Streamlit (Web Application Framework)",
+      "Flask (for app.py)",
+      "TensorFlow (implied if used for training)",
+      "Python programming fundamentals (variables, dictionaries, file I/O).",
+      "Understanding of basic web application structure.",
+      "Pandas",
+      "Natural Language Processing (NLP)",
+      "Scikit-learn",
+      "IBM WatsonX AI (LLM Integration)",
+      "AWS S3",
+      "Pickle",
+      "Environment Variable Management",
+      "Deployment Concepts (model loading, device management)",
+      "Algorithm Implementation",
+      "Python",
+      "Text Preprocessing",
+      "Secrets Management (.streamlit/secrets.toml)",
+      "AWS Lambda",
+      "Machine learning model serialization/deserialization using `pickle`.",
+      "Python Programming",
+      "Basic Flask web framework usage (app initialization, importing modules).",
+      "Flask",
+      "Error Handling (conditional imports)",
+      "NLTK",
+      "API Integration",
+      "MongoDB (Database Integration)",
+      "Image Processing (PIL)",
+      "Machine Learning (Naive Bayes)",
+      "PyTorch",
+      "Streamlit (for ml-model.py)",
+      "Web Development (basic HTML/JS for app.py)",
+      "Sentiment Analysis",
+      "Torchvision",
+      "Regular Expressions"
     ]
   },
   "experience": [
     {
-      "company": "George Washington University",
-      "role": "Student Administrative Assistant",
-      "duration": "Jun 2025 - Present",
-      "location": "Washington, DC",
-      "description": "Initiated and implemented data collection and cost analysis for special projects, leveraging strong analytical skills to drive process improvements and ensure accurate documentation for the Division of Safety and Operations team. Coordinated event logistics and digital communications, handling setup and cleanup while designing flyers, web content, and promotional materials with CSS and Google Cloud, demonstrating technical aptitude and multi-tasking to boost campus event attendance and improve audience engagement."
+      "company": "SyenApp India PVT, LTD (Techminds Group LLC)",
+      "role": "Senior Machine Learning Engineer",
+      "duration": "Mar 2023 - Aug 2024",
+      "location": "Chennai, India",
+      "description": "Led a 12-member ML team to scale SyenApp\u2019s mobile platform from 300 \u2192 10,000 users within one year. Built a personalized recommendation engine leveraging behavioral and demographic data, increasing engagement by 50% in six months. Engineered a self-learning NLP-based email tagging system using SVC and PyTorch, achieving 98% classification accuracy on 1M+ emails and reducing manual intervention by 80%. Developed real-time dashboards using Elasticsearch and Plotly, driving a 30\u00d7 increase in daily purchases after app optimizations. Mentored 20+ interns in Python, NLP, and Data Science, conducting workshops and hands-on training to improve technical skills and team efficiency."
     },
     {
-      "company": "Pantech Prolabs",
-      "role": "Data Analytics Intern",
-      "duration": "Jan - Jul 2024",
-      "location": "Chennai, TN",
-      "description": "Performed preliminary analysis of online sales data using PowerBI and SQL Server, uncovering key sales patterns that guided the team\u2019s next reporting cycle. Generated pivot tables in Excel, performed data conversion and conducted measurement analysis to compare sales performance across product categories, revealing that the top 3 best-selling products accounted for 60% of total revenue and enabling focused resource prioritization."
+      "company": "Techminds Group LLC",
+      "role": "Junior Machine Learning Engineer",
+      "duration": "Aug 2019 - Mar 2023",
+      "location": "Chennai, India",
+      "description": "Designed and deployed SyenApp\u2019s backend email processing pipeline capable of handling millions of emails in real time. Implemented a spam detection system using Multinomial Naive Bayes, reducing false positives by 85% within one month. Automated personalized podcast email campaigns using Python, delivering tailored recommendations to 10K+ users."
     },
     {
-      "company": "Accenture Solutions",
-      "role": "Associate Software Engineer",
-      "duration": "Nov 2022 - Dec 2023",
-      "location": "Chennai, TN",
-      "description": "Analyzed loan information using statistical modeling techniques and designed a comprehensive KPI dashboard with PowerBI, leveraging SQL and data mining techniques to enable banking clients to monitor loan performance and identify repayment patterns, resulting in improved reporting efficiency and positive client feedback."
-    },
-    {
-      "company": "VBind Innovation Pvt Ltd",
-      "role": "Web Developer Intern",
-      "duration": "May - June 2021",
-      "location": "Chennai, TN",
-      "description": "Implemented a web-based virtual tourist guide application using React, which provided interactive maps with location markers and directions, enhancing user navigation experience."
+      "company": "Techminds Group LLC",
+      "role": "Machine Learning Software Engineer Intern",
+      "duration": "Mar 2026 - Present",
+      "location": "Washington DC (remote)",
+      "description": "Built a personalized product recommendation engine combining Groq LLMs and RAG to analyze user browsing history, brand preferences, and search behavior, delivering tailored suggestions with filtering and re-ranking techniques. Rebuilding the email classification system using Groq-powered LLMs to categorize emails across 11 types (promotional, transactional, coupon, newsletter), targeting 90%+ accuracy and eliminating manual retraining cycles dormant for 2+ years. Researching multi-agent AI workflows using Claude to automate customer support tasks, including retrieving special offers from brand partners and extracting product recommendations to reduce manual workload."
     }
   ],
   "education": [
     {
-      "institution": "George Washington University",
-      "degree": "Master\u2019s",
+      "institution": "The George Washington University, Columbian College of Arts and Sciences",
+      "degree": "MS",
       "field": "Data Science",
       "year": "2024 - 2026"
-    },
-    {
-      "institution": "Velammal Engineering College",
-      "degree": "Bachelor of Engineering",
-      "field": "Computer Science",
-      "year": "2018 - 2022"
     }
   ],
-  "certifications": [
-    "Masters in Coding and Python with ML (Kaashiv Infotech)",
-    "Python for Data Science (IBM Cognitive Class)",
-    "Introduction to Amazon Elastic Compute Cloud(EC2) (AWS)",
-    "The Fundamentals of Digital Marketing (Google)"
-  ],
+  "certifications": [],
   "projects": {
     "from_resume": [
       {
-        "name": "Air Pollution and Economic Activity - World Bank Data Lab Capstone Project",
-        "description": "Analyze and integrate satellite air pollution (NO2, PM2.5, SO2, CH4) and sectoral GDP datasets using Python to evaluate pollution as a proxy for economic activity across countries as part of a World Bank Data Lab affiliated capstone project at GWU, collaborating with economics researchers.",
+        "name": "MedBird \u2013 Multi-Agent Hospital Front Desk Assistant",
+        "description": "Built a multi-agent GenAI system using WatsonX LLMs, LangChain, and FastAPI to handle appointment scheduling, patient triage, and doctor-ready summary generation. Integrated SMTP Email for automated appointment notifications and developed a Streamlit-based interface for hospital staff. Designed a scalable backend pipeline for seamless orchestration of multiple agents in real time.",
         "technologies": [
-          "Python"
-        ]
-      },
-      {
-        "name": "Multi-Agent Job Email Assistant",
-        "description": "Built a multi-agent system of automation by means of LangGraph and an agentic RAG (Retrieval, Augmented Generation) pipeline to convert disorganized Gmail data into a structured job tracker, thus enabling querying in natural language through ChromaDB. Formulated a streamlined classifier which scored 99% accuracy by employing TF-IDF and Logistic Regression to remove the inbox clutter, and wrapped up the whole thing into a Streamlit dashboard linked to the Gmail API for live updates.",
-        "technologies": [
-          "LangGraph",
-          "RAG",
-          "ChromaDB",
-          "TF-IDF",
-          "Logistic Regression",
+          "WatsonX LLMs",
+          "LangChain",
+          "FastAPI",
           "Streamlit",
-          "Gmail API"
+          "GenAI"
         ]
       },
       {
-        "name": "Image Steganalysis: Detect Hidden Information with Machine Learning",
-        "description": "Developed an image analysis system with a team of four in 36 hours to detect hidden messages in images, achieving 95% accuracy using machine learning models.",
+        "name": "Dermachecker \u2013 Skin Cancer Classification",
+        "description": "Developed a multi-class melanoma classification model using ResNet-121 transfer learning, trained on CUDA-enabled GPUs for accelerated convergence. Achieved 90% accuracy and deployed a Flask-based interactive demo, attracting 500+ active users. Optimized data preprocessing and augmentation to improve model generalization and reduce overfitting.",
         "technologies": [
-          "Machine Learning"
+          "ResNet-121",
+          "CUDA",
+          "Flask"
         ]
       },
       {
-        "name": "Dating Platform Behavior and Prediction Analysis",
-        "description": "Collaborated with team of four to create dating match platform model using R to analyze 60K+ rows of raw data. Examined user data to discover that users with graduate degrees selected hiking as a first-date activity nearly 45% more often than those with only a bachelor\u2019s degree. Formulated 15+ ggplot2 visualizations revealing demographic-based match acceptance patterns, enabling team to identify areas for optimization and generate a report for data insights.",
+        "name": "YouTube Comments Sentiment Analysis",
+        "description": "Designed an NLP pipeline using NLTK and scikit-learn to classify sentiments from YouTube video comments. Deployed the model on AWS Lambda and integrated it with an API Gateway HTTPS endpoint for real-time sentiment analysis. Implemented secure key-based authentication to control API access and monitor request usage.",
         "technologies": [
-          "R",
-          "ggplot2"
-        ]
-      },
-      {
-        "name": "Virtual Police Station",
-        "description": "Created web application accessible through mobile to enable better communication between victims and police stations, capable of accepting full incident data and complainant details with 60% lesser input compared to conventional reporting, and capable of lessening documentation procedure by up to 15 minutes per case through interface usability analysis.",
-        "technologies": [
-          "Web Application"
-        ]
-      },
-      {
-        "name": "Eye on the Road",
-        "description": "Led the development of a web application using MapMyIndia API to enable users to identify potholes on travel routes with a view to improve the journey planning and possibly save 15 minutes of travel inconvenience.",
-        "technologies": [
-          "MapMyIndia API",
-          "Web Application"
+          "NLP",
+          "NLTK",
+          "scikit-learn",
+          "AWS Lambda",
+          "API Gateway"
         ]
       }
     ],
     "from_github": [
       {
-        "name": "Bitcamp_Steganalysis",
-        "description": null,
+        "name": "dermachecker-skin-lesion-classifier",
+        "description": "Melanoma classification using CNN (transfer learning)",
+        "technologies": [
+          "Jupyter Notebook",
+          "Python"
+        ],
+        "source": "github",
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 11,
+        "last_updated": "2025-09-04T22:41:09Z",
+        "readme": "# dermachecker-skin-lesion-classifier\nMelanoma classification using CNN (transfer learning)\n\n## Overview\n\nDermachecker is a deep-learning-powered image classification app built to classify skin lesion images into one of seven categories.\nThe model is based on DenseNet121 and fine-tuned on a dermoscopic skin image dataset.\n\nhttps://github.com/user-attachments/assets/bd6800d7-f960-44eb-9eb5-c34e8209abb6\n\n\n\nThis was a personal project I worked on a few years ago to explore AI in healthcare and medical image classification. Recently, I refreshed the repository and added an interactive inference app built using Streamlit.\n\n## Features\n\ud83e\udde0 Deep Learning Model \u2014 DenseNet121 fine-tuned for multiclass classification\n\n\ud83e\ude7b 7 Skin Lesion Classes:\n\nActinic keratoses\n\nBasal cell carcinoma\n\nBenign keratosis-like lesions\n\nDermatofibroma\n\nVascular lesions\n\nMelanocytic nevi\n\n\ud83d\uddbc Interactive App \u2014 Upload an image and get instant classification results\n\n\n\n\n",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {
+          "app.py": "# app.py\r\nimport io, base64\r\nfrom PIL import Image\r\nfrom flask import Flask, request, jsonify, render_template_string\r\nimport torch\r\nimport torch.nn as nn\r\nfrom torchvision import models, transforms\r\n\r\n# ------- config -------\r\n# Your exact mapping (index -> label)\r\nIDX_TO_LABEL = {\r\n    2: 'Benign keratosis-like lesions ',\r\n    4: 'Melanocytic nevi',\r\n    3: 'Dermatofibroma',\r\n    6: 'Dermatofibroma',\r\n    5: 'Vascular lesions',\r\n    1: 'Basal cell carcinoma',\r\n    0: 'Actinic keratoses',\r\n}\r\nN",
+          "ml-model.py": "# app.py\r\nimport io\r\nfrom typing import Dict, Any, Optional\r\n\r\nimport streamlit as st\r\nfrom PIL import Image\r\nimport torch\r\nimport torch.nn as nn\r\nfrom torchvision import models, transforms\r\n\r\n# ---------------- Config ----------------\r\n# Your exact mapping (index -> label)\r\nIDX_TO_LABEL: Dict[int, str] = {\r\n    2: 'Benign keratosis-like lesions ',\r\n    4: 'Melanocytic nevi',\r\n    3: 'Dermatofibroma',\r\n    6: 'Dermatofibroma',\r\n    5: 'Vascular lesions',\r\n    1: 'Basal cell carcinoma',\r\n    0: '"
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 6,
+            "rating": "Intermediate",
+            "summary": "The code is functional for its intended purpose of image classification, but lacks robust error handling, comprehensive documentation, and separation of concerns. Some configuration is hardcoded and could be externalized. Type hinting is present in `ml-model.py`, which is good."
+          },
+          "technical_complexity": {
+            "score": 5,
+            "rating": "Intermediate",
+            "summary": "The core logic involves loading a pre-trained PyTorch model (DenseNet121) and performing inference on user-provided images. This requires understanding of deep learning frameworks, image processing, and web/app development basics. The integration of these components adds moderate complexity."
+          },
+          "architecture_patterns": [
+            "Model-View-Controller (implied)",
+            "Client-Server (for app.py)",
+            "API (for app.py)"
+          ],
+          "skills_demonstrated": [
+            "Python",
+            "PyTorch",
+            "TensorFlow (implied if used for training)",
+            "Torchvision",
+            "Flask (for app.py)",
+            "Streamlit (for ml-model.py)",
+            "Image Processing (PIL)",
+            "Web Development (basic HTML/JS for app.py)",
+            "Deployment Concepts (model loading, device management)"
+          ],
+          "best_practices_used": [
+            "Using `torch.no_grad()` during inference (implied by `model.eval()`)",
+            "Predefined transforms for consistent preprocessing",
+            "Separation of model loading and application logic",
+            "Type hinting (in ml-model.py)",
+            "Using environment variables or config for paths (potential, but not fully implemented)",
+            "Model evaluation mode (`model.eval()`)",
+            "Caching model loading (in ml-model.py with `st.cache_resource`)"
+          ],
+          "areas_for_improvement": [
+            "Error Handling: Add more robust error handling for file uploads, model loading, and inference. For example, what happens if `best_model_weights.pt` is missing or corrupted?",
+            "Configuration Management: Externalize configuration like model paths, device settings, and potentially `IDX_TO_LABEL` into a configuration file (e.g., `.env`, `config.yaml`) instead of hardcoding them in the script.",
+            "Logging: Implement logging to track application events, errors, and performance.",
+            "Code Documentation: Add more docstrings to functions and classes, especially to explain complex logic or parameters.",
+            "Input Validation: Validate the uploaded image format and size before attempting to process it.",
+            "Security: For `app.py`, ensure the HTML template is sanitized if user-generated content is ever displayed. Sanitize file uploads to prevent malicious file execution. Consider rate limiting if deployed publicly.",
+            "Modularity: The HTML template in `app.py` is embedded as a string. For larger applications, it's better to use separate HTML files and Flask's templating engine (Jinja2).",
+            "Dependency Management: Use a `requirements.txt` or `pyproject.toml` to list all dependencies.",
+            "Device Management Flexibility: While `DEVICE = torch.device('cpu')` is a good default, explicitly checking for CUDA availability and allowing user override would be better.",
+            "Model Loading Robustness (`ml-model.py`): The `load_model_from_source` function could be more robust in handling different ways of loading checkpoints (e.g., directly from bytes vs. path) and providing clearer feedback if loading fails."
+          ],
+          "overall_assessment": "The code provides a functional starting point for a skin lesion classification application using PyTorch. It demonstrates a solid understanding of deep learning model deployment with common web frameworks (Flask) and data science application builders (Streamlit). The core model loading and inference logic is sound. However, significant improvements can be made in terms of robustness, maintainability, security, and user experience through better error handling, configuration management, and code organization. The inclusion of type hints in `ml-model.py` is a positive step towards better code quality.",
+          "notable_observations": [
+            "Two separate files (`app.py` and `ml-model.py`) are provided, suggesting the project might be targeting different deployment scenarios (e.g., Flask API vs. Streamlit app).",
+            "The `IDX_TO_LABEL` mapping has duplicate labels ('Dermatofibroma'), which might indicate a preprocessing or labeling issue during training, or it's intentional for some reason. This should be clarified.",
+            "Hardcoding the model path and device is a common simplification, but for production, these should be configurable.",
+            "`torch.set_num_threads(1)` in `app.py` is likely to prevent potential multi-threading issues within PyTorch, which can be relevant for CPU inference performance.",
+            "The use of `st.cache_resource` in `ml-model.py` is an excellent practice for Streamlit applications to avoid reloading the model on every user interaction."
+          ]
+        }
+      },
+      {
+        "name": "image-steganalayiss-CNN",
+        "description": "Image steganalysis using traditional CNN model",
         "technologies": [
           "Jupyter Notebook",
           "Python",
@@ -268,64 +343,9 @@
         "source": "github",
         "stars": 0,
         "forks": 0,
-        "commit_count": 4,
-        "last_updated": "2025-09-24T20:04:43Z",
-        "readme": "We've developed a groundbreaking model that can instantly determine if an image contains a hidden message. With 95% accuracy, our technology analyzes digital images to detect subtle steganographic traces that are invisible to the human eye.\nImagine being able to scan through thousands of images and identify which ones might be concealing secret information - that's exactly what our model does. Perfect for cybersecurity, digital forensics, and protecting sensitive information.\nIn just milliseconds, we can tell you: Is there a secret message hiding in this image? Yes or no.\n\nContributions in : https://github.com/aniruddhg43986683/Bitcamp_Steganalysis/tree/main\n",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "Food-Deserts-in-the-United-States",
-        "description": null,
-        "technologies": [
-          "Jupyter Notebook"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 20,
-        "last_updated": "2025-03-27T22:46:55Z",
-        "readme": "\ud83e\udd66 Food Desert Analysis Across the United States\n\nThis project explores the distribution, severity, and key socio-economic drivers of food deserts in the United States using the USDA's Food Research Atlas and Food Environment Atlas datasets. Through in-depth data analysis, visualization, and machine learning models, we identify high-risk regions and propose actionable solutions for improving food accessibility and reducing nutritional inequality.\n\n---\n\n\ud83d\udcc1 Project Structure\n\n- \ud83d\udcca Data Exploration & Visualization\n- \ud83e\udde0 Predictive Modeling (Classification & Regression)\n- \ud83e\uddea Statistical Testing (T-tests, Correlation Analysis)\n- \ud83d\udcc8 Policy Recommendations & Regional Insights\n\n---\n\n\ud83e\uddfe Datasets Used\n\n- Food Access Research Atlas (2019)  \n  Provided by the USDA. Includes tract-level information on low-income and low-access areas.\n\n- Food Environment Atlas  \n  County-level indicators of food choices, health outcomes, and community characteristics.\n\n---\n\n\ud83e\uddea Modeling\n\n- Classification Model:\n  - Type: Rand",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "greek-symbols",
-        "description": "Greek symbols plugin for IntelliJ IDEA",
-        "technologies": [
-          "Scala"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
         "commit_count": 3,
-        "last_updated": "2026-02-23T05:19:12Z",
-        "readme": "# greek-symbols\nGreek symbols plugin for IntelliJ IDEA\n\n | Abbr |Letter| Name    |\n |------|------|---------|\n |  aa  |  \u03b1   | Alpha   |\n |  bb  |  \u03b2   | Beta    |\n |  gg  |  \u03b3   | Gamma   |\n |  dd  |  \u03b4   | Delta   |\n |  ee  |  \u03b5   | Epsilon |\n |  zz  |  \u03b6   | Zeta    |\n |  eta |  \u03b7   | Eta     |\n |  tt  |  \u03b8   | Theta   |\n |  ii  |  \u03b9   | Iota    |\n |  kk  |  \u03ba   | Kappa   |\n |  ll  |  \u03bb   | Lambda  |\n |  mu  |  \u03bc   | Mu      |\n |  nu  |  \u03bd   | Nu      |\n |  xi  |  \u03be   | Xi      |\n |  oo  |  \u03bf   | Omicron |\n |  pi  |  \u03c0   | Pi      |\n |  rr  |  \u03c1   | Rho     |\n |  ss  |  \u03c3   | Sigma   |\n |  tau |  \u03c4   | Tau     |\n |  uu  |  \u03c5   | Upsilon |\n |  pp  |  \u03c6   | Phi     |\n |  xx  |  \u03c7   | Chi     |\n |  psi |  \u03c8   | Psi     |\n |  ww  |  \u03c9   | Omega   |\n",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": "",
-        "is_fork": true,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "IMFRA",
-        "description": "Research Analyst Recruitment Test",
-        "technologies": [],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 1,
-        "last_updated": "2026-02-23T09:56:35Z",
-        "readme": "# IMFRA\nResearch Analyst Recruitment Test\n",
+        "last_updated": "2025-09-04T22:43:55Z",
+        "readme": "We've developed a groundbreaking model that can instantly determine if an image contains a hidden message. With 95% accuracy, our technology analyzes digital images to detect subtle steganographic traces that are invisible to the human eye.\r\nImagine being able to scan through thousands of images and identify which ones might be concealing secret information - that's exactly what our model does. Perfect for cybersecurity, digital forensics, and protecting sensitive information.\r\nIn just milliseconds, we can tell you: Is there a secret message hiding in this image?\u00a0Yes\u00a0or\u00a0no.\r\n",
         "topics": [],
         "has_live_demo": false,
         "homepage": null,
@@ -334,29 +354,8 @@
         "code_insights": {}
       },
       {
-        "name": "InvestIQ",
-        "description": "A UI/UX-first educational web app that teaches beginners how real investing works \u2014 honestly, visually, and interactively.",
-        "technologies": [
-          "HTML",
-          "CSS",
-          "JavaScript"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 5,
-        "last_updated": "2025-11-16T16:46:44Z",
-        "readme": "# \ud83d\udcca InvestIQ \u2013 Interactive Portfolio Sandbox for Beginner Investors  \n\n## \ud83c\udf1f Inspiration  \nMost beginner investors have **no idea** what cash, bonds, stocks, index funds, or crypto actually mean \u2014 or how risky they are during real crashes.  \nAlmost every financial tool assumes prior knowledge, which leaves beginners confused and overwhelmed.  \n\nWe wanted to fix that by building a **beginner-first**, **visual**, **game-like** investing education tool.  \nA tool where users *learn by doing*, not reading boring textbooks.  \n\nThus, **InvestIQ** was born.  \n\n---\n\n## \ud83e\udde9 What it does  \nInvestIQ is a **multi-page, interactive financial learning platform** that teaches beginners how investing works using:  \n- \ud83c\udfae **Drag-and-drop portfolio building**  \n- \ud83d\udcca **Live animated pie charts**  \n- \u26a0\ufe0f **Real-time risk calculation**  \n- \ud83e\udde0 **Beginner-friendly explanations**  \n- \ud83d\udcf0 **Real market event stories with external links**  \n- \ud83c\udf08 **Cyberpunk neon UI/UX and animations**  \n\n### \ud83d\udca1 Core Features  \n- \ud83e\uddf1 Drag mone",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "Multi-Agent-Job-Email-Assistant",
-        "description": null,
+        "name": "medbird-multi-agent-hospital-front-desk-system",
+        "description": "A multi-agent hospital front desk system that automates patient intake, appointment booking, clinical summary generation, cost estimation, and notifications \u2014 streamlining workflows for both patients and healthcare staff.",
         "technologies": [
           "Python"
         ],
@@ -364,340 +363,531 @@
         "stars": 0,
         "forks": 0,
         "commit_count": 27,
-        "last_updated": "2026-01-21T02:01:46Z",
-        "readme": "# Multi Agent Gmail Job Application Tracker\n#### Automated Email Classification \u2022 Job Entity Extraction \u2022 RAG Search \u2022 ChromaDB Storage \u2022 Streamlit Demo\n\n## DATS 6312 \u2013 Introduction to Natural Language Processing  \nGeorge Washington University  \nInstructor: Dr. Amir Jafari  \nGroup Members: Aswin Balaji Thippa Ramesh, Siddharth Sriram, Rahul Arvind\n\n# Project Overview\n\nThis repository contains the full implementation of our final NLP project for DATS 6312 at The George Washington University.  \nThe project focuses on designing and deploying an automated, end-to-end system that:\n\n- Connects securely to the user\u2019s Gmail inbox  \n- Classifies incoming emails as job-related or non-job-related  \n- Extracts structured metadata such as company name, position applied for, status, application date, and original Gmail link  \n- Stores processed emails as embeddings inside a vector database (ChromaDB)  \n- Enables a Retrieval-Augmented Generation (RAG) interface to query job application history using ",
+        "last_updated": "2025-09-04T23:22:02Z",
+        "readme": "# MedBird \u2014 Agentic Appointment & Intake (IBM watsonx)\n\n### Submission for the IBM TechXchange 2025 Pre-Conference watsonx Hackathon (Agentic AI track).\n\nMedBird is an AI front-desk assistant for clinics. It books appointments from natural language, validates contact info, stores to MongoDB, emails the patient a confirmation, and generates a concise doctor-ready summary.\n\n### Agent 1 \nBooking & Notifications: Streamlit chatbot + MongoDB + SMTP email\n\n### Agent 2 \nClinical Summary: Fixed-format patient summary for doctors (Streamlit)\n\nAI: IBM watsonx Granite via ModelInference.chat\n\n\n# Demo\n\nhttps://youtu.be/vM9zD4_DfPU\n\n# Why MedBird\n\nScheduling and intake create bottlenecks for clinics. Patients want simple, natural-language booking; doctors want a crisp summary before the visit. MedBird automates both with agentic AI.\n\n# Features\n\nUnderstands free-text symptoms and maps to the right specialist\n\nInterprets time phrases (\u201cMonday 10am\u201d, \u201ctomorrow morning\u201d) within working hours\n\nValidate",
         "topics": [],
         "has_live_demo": false,
         "homepage": null,
         "is_fork": false,
         "code_samples": {
-          "Code/Classifier 1/predict.py": "import pandas as pd\nimport joblib\nimport os\nimport sys\n\n# -----------------------------\n# CONFIG\n# -----------------------------\nexcel_path = \"../../data/gmail_subject_body_date.xlsx\"\nmodel_path = \"job_classifier_baseline.pkl\"\n\n\n# -----------------------------\n# SAFE LOADER FOR EXCEL FILES\n# -----------------------------\ndef load_excel_safely(path):\n    try:\n        print(f\"[INFO] Loading Excel file: {path}\")\n        return pd.read_excel(path)\n    except Exception as e:\n        print(f\"[ERROR] C",
-          "Code/Classifier 1/training.py": "import pandas as pd\nimport joblib\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import classification_report, confusion_matrix\nimport sys\nimport os\n\n\ndef load_csv_safely(path):\n    \"\"\"\n    Try multiple encodings until one works.\n    \"\"\"\n    encodings_to_try = [\n        \"utf-8\",\n        \"latin1\",\n        \"cp1252\",\n       ",
-          "Code/Classifier 2/job_classification.py": "\nimport os\nimport re\nimport numpy as np\nimport pandas as pd\nfrom sentence_transformers import SentenceTransformer\nfrom sklearn.metrics.pairwise import cosine_similarity\n\n\n# ============================\n# CONFIG\n# ============================\n\nJOBS_FILE   = \"../../Data/jobs.csv\"\nGMAIL_FILE  = \"../../Data/gmail_subject_body_date.xlsx\"\nOUTPUT_FILE = \"../../Data/mail_classified2.xlsx\"\n\nJOBS_SUBJECT_COL = \"subject\"\nJOBS_BODY_COL = \"email_body\"\nGMAIL_SUBJECT_COL = \"subject\"\nGMAIL_BODY_COL = \"body\"\n\nMO",
-          "Code/Classifier 3/predict.py": "import os\nimport pandas as pd\nimport joblib\nimport torch\n\n\nos.environ[\"OMP_NUM_THREADS\"] = \"1\"\nos.environ[\"MKL_NUM_THREADS\"] = \"1\"\nos.environ[\"TOKENIZERS_PARALLELISM\"] = \"false\"\n\nPROJECT_ROOT = os.path.abspath(os.path.join(os.getcwd(), \"..\", \"..\"))\nDATA_DIR = os.path.join(PROJECT_ROOT, \"Data\")\nCODE_DIR = os.path.join(PROJECT_ROOT, \"Code\")\n\nMODEL_PKL = os.path.join(CODE_DIR, \"bert_email_classifier.pkl\")\nINPUT_FILE = os.path.join(DATA_DIR, \"gmail_subject_body_date.xlsx\")\nOUTPUT_FILE = os.path.join",
-          "Code/Classifier 3/training.py": "import os\nimport pandas as pd\nimport joblib\nimport torch\nfrom datasets import Dataset\nfrom transformers import (\n    DistilBertTokenizerFast,\n    DistilBertForSequenceClassification,\n    TrainingArguments,\n    Trainer\n)\n\n\nPROJECT_ROOT = os.path.abspath(os.path.join(os.getcwd(), \"..\", \"..\"))\n\nDATA_DIR = os.path.join(PROJECT_ROOT, \"Data\")\nMODEL_DIR = os.path.join(PROJECT_ROOT, \"bert_email_classifier\")\nCODE_DIR = os.path.join(PROJECT_ROOT, \"Code\")\n\nos.makedirs(MODEL_DIR, exist_ok=True)\nos.makedirs("
+          "apps/medbird_chatbot.py": "# medbird_chatbot.py \u2014 Full Streamlit + watsonx + Mongo (users + appointments)\n# ----------------------------------------------------------------------\n# Quick start:\n#   pip install --upgrade streamlit pymongo ibm-watsonx-ai\n#   python -m streamlit run \"medbird_chatbot.py\"\n#\n# Optional: .streamlit/secrets.toml (same folder as this file)\n# [ibm]\n# api_key    = \"...\"\n# url        = \"https://us-south.ml.cloud.ibm.com\"\n# project_id = \"...\"\n# model_id   = \"ibm/granite-3-3-8b-instruct\"\n# [mongo]\n# ur",
+          "apps/summary_generator.py": "# doctor_summary_agent.py\r\n# -------------------------------------------------\r\n# Quick start:\r\n#   pip install --upgrade streamlit pymongo ibm-watsonx-ai\r\n#   python -m streamlit run \"doctor_summary_agent.py\"\r\n#\r\n# Optional: .streamlit/secrets.toml (same folder)\r\n# [ibm]\r\n# api_key    = \"...\"\r\n# url        = \"https://us-south.ml.cloud.ibm.com\"\r\n# project_id = \"...\"\r\n# [mongo]\r\n# uri = \"...\"\r\n# db  = \"medbird\"\r\n# [clinic]\r\n# tz  = \"America/New_York\"\r\n# -------------------------------------------"
         },
         "code_insights": {
           "code_quality": {
             "score": 7,
-            "rating": "Intermediate",
-            "summary": "The code is generally clean, readable, and well-structured with clear separation of concerns (training vs. prediction). Error handling for file operations is present and functional. However, there are some inconsistencies in path management across different classifier modules, and opportunities exist to refactor repetitive code and improve configurability."
-          },
-          "technical_complexity": {
-            "score": 8,
             "rating": "Advanced",
-            "summary": "The project demonstrates a strong understanding of various NLP and machine learning techniques. It progresses from traditional ML (TF-IDF with Logistic Regression in Classifier 1), to a hybrid approach combining sentence embeddings and rule-based regex patterns (Classifier 2), and finally to state-of-the-art deep learning with Hugging Face Transformers (DistilBERT in Classifier 3). This range of approaches indicates significant technical breadth and depth."
-          },
-          "architecture_patterns": [
-            "Machine Learning Pipeline (Data Loading -> Preprocessing -> Model Training/Loading -> Prediction)",
-            "Modular Design (separation of training and prediction scripts, helper functions)",
-            "Data Access Layer (simple file I/O for CSV/Excel)",
-            "Configuration Management (basic hardcoded paths and thresholds, improved in Classifier 3 with PROJECT_ROOT)"
-          ],
-          "skills_demonstrated": [
-            "Python Programming (scripting, data manipulation)",
-            "Data Handling and Cleaning (Pandas for Excel/CSV, fillna, column operations)",
-            "Traditional Machine Learning (Scikit-learn, TF-IDF, Logistic Regression, model evaluation)",
-            "Natural Language Processing (Text preprocessing, regex, TF-IDF, sentence embeddings, Transformer models)",
-            "Deep Learning Fundamentals (PyTorch for model inference, Hugging Face Transformers for fine-tuning)",
-            "Software Engineering Fundamentals (basic error handling, modularity, file system operations)",
-            "Model Persistence and Loading (joblib)",
-            "Experimentation and Iterative Development (implied by multiple classification approaches)"
-          ],
-          "best_practices_used": [
-            "Modular Code Design (e.g., dedicated safe loading functions)",
-            "Clear Separation of Concerns (training vs. prediction scripts)",
-            "Basic Error Handling and Validation (os.path.exists, try-except for file I/O, column validation)",
-            "Informative Logging (using [INFO], [ERROR], [WARN] prefixes)",
-            "Model Persistence (saving/loading models with joblib)",
-            "Dataset Balancing (Classifier 3 training script explicitly balances classes for imbalanced datasets)"
-          ],
-          "areas_for_improvement": [
-            "**Path Management:** Standardize and centralize path configurations, ideally using `pathlib` for cross-platform compatibility instead of `os.path.join` and relative `../../` paths. Consider a dedicated `config.py` file.",
-            "**Code Duplication:** Refactor repetitive data preprocessing steps (e.g., `fillna('')`, column concatenation) into reusable utility functions or a shared module.",
-            "**Logging:** Replace `print()` statements with Python's built-in `logging` module for more robust and configurable logging.",
-            "**Error Handling:** In a larger application, consider raising custom exceptions instead of `sys.exit(1)` to allow for more graceful error recovery or handling by calling code.",
-            "**Configurability:** Externalize hardcoded model names, file paths, and thresholds into configuration files or command-line arguments for easier modification and deployment.",
-            "**Model Management:** Implement a more robust `EmailClassifierWrapper` in Classifier 3, potentially encapsulating the `predict` method directly.",
-            "**Testing:** Add unit and integration tests to ensure code correctness and maintainability.",
-            "**Documentation:** Enhance docstrings for functions, classes, and modules to improve code understanding and maintainability.",
-            "**Input Validation:** Beyond column existence, consider validating data types and content where appropriate.",
-            "**Version Control for ML Assets:** For a more mature ML project, consider tools like DVC or MLflow for tracking data, models, and experiments."
-          ],
-          "overall_assessment": "The project demonstrates a solid foundation in machine learning and natural language processing, showcasing the ability to implement and compare diverse classification techniques. The code is functional and addresses the core problem of email classification effectively. While good practices are present for data handling and model management, there are clear opportunities to enhance the codebase towards more robust, scalable, and production-ready software engineering standards, particularly in configuration management, code organization, and error handling. The multi-classifier approach is a strong indicator of an experimental and solution-oriented mindset.",
-          "notable_observations": [
-            "**Multi-Strategy Classification:** The most striking feature is the development of three distinct classifiers (traditional ML, semantic similarity with regex, and deep learning with Transformers), indicating a comprehensive approach to the problem.",
-            "**Evolution of Techniques:** The project showcases a clear progression in technical sophistication, from simpler `sklearn` models to advanced `huggingface/transformers` usage.",
-            "**Domain-Specific Rules:** Classifier 2 effectively integrates domain knowledge through explicit regex patterns for common job-related email phrases, which can significantly improve accuracy for specific categories.",
-            "**Awareness of Data Imbalance:** The training script for Classifier 3 demonstrates awareness of imbalanced datasets and applies balancing techniques (sampling), which is a crucial ML best practice.",
-            "**Project Name vs. Code Samples:** The project name 'Multi-Agent-Job-Email-Assistant' suggests a broader architecture, but the provided code snippets focus exclusively on the email classification component, implying these are building blocks for a larger system."
-          ]
-        }
-      },
-      {
-        "name": "MY-PAGE",
-        "description": "htmlcssbootstrapjsphpcodes on register and login pages",
-        "technologies": [
-          "CSS",
-          "PHP",
-          "JavaScript",
-          "HTML"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 28,
-        "last_updated": "2021-04-29T04:29:54Z",
-        "readme": "# MY-PAGE\nhtmlcssbootstrapjsphpcodes on register and login pages\n",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": "",
-        "is_fork": false,
-        "code_samples": {
-          "my2ndprojectfarmersdream/index.php": "<?php\nrequire\"config.php\";\nif(isset($_POST['submit']))\n    {\n        $name=$_POST['YourName'];\n        $email=$_POST['Email'];\n        $phone=$_POST['PhoneNumber'];\n        $message=$_POST['Message'];\n\t\n        if($name==\"\" && $email==\"\" && $phone==\"\" && $message==\"\")\n\t\t{\n            echo\"please fill in all the information\";\n        }\n        else\n        {\n            $j_qry=$conn->query(\"Insert into feedback(name,email,phone,message) values('$name','$email','$phone','$message')\");\n            ",
-          "my2ndprojectfarmersdream/js/custom.js": "/*---------------------------------------------------------------------\r\n    File Name: custom.js\r\n---------------------------------------------------------------------*/\r\n\r\n$(function () {\r\n\r\n\t\"use strict\";\r\n\r\n\t/* Preloader\r\n\t-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */\r\n\r\n\tsetTimeout(function () {\r\n\t\t$('.loader_bg').fadeToggle();\r\n\t}, 1500);\r\n\r\n\t/* JQuery Menu\r\n\t-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- */\r\n\r\n\t$(document).ready(functi",
-          "my2ndprojectfarmersdream/js/jquery.validate.js": "/*!\n * jQuery Validation Plugin v1.17.0\n *\n * https://jqueryvalidation.org/\n *\n * Copyright (c) 2017 J\u00f6rn Zaefferer\n * Released under the MIT license\n */\n(function( factory ) {\n\tif ( typeof define === \"function\" && define.amd ) {\n\t\tdefine( [\"jquery\"], factory );\n\t} else if (typeof module === \"object\" && module.exports) {\n\t\tmodule.exports = factory( require( \"jquery\" ) );\n\t} else {\n\t\tfactory( jQuery );\n\t}\n}(function( $ ) {\n\n$.extend( $.fn, {\n\n\t// https://jqueryvalidation.org/validate/\n\tvalidate: ",
-          "php/login.php": "<?php\ninclude \"config1.php\";\n\nif(isset($_POST['submit'])){\n\n    $uname = mysqli_real_escape_string($con,$_POST['name']);\n    $password = mysqli_real_escape_string($con,$_POST['password']);\n\n    if ($uname != \"\" && $password != \"\"){\n\n        $sql_query = \"select count(*) as cntUser from Admin where username='\".$uname.\"' and password='\".$password.\"'\";\n        //you can declare as many $sql_query variables for as many tables you have.\n        $result = mysqli_query($con,$sql_query);\n        //you c",
-          "php/register.php": "<?php\nrequire\"config.php\";\nif(isset($_POST['submit']))\n    {\n        $name=$_POST['name'];\n        $fullname=$_POST['fullname'];\n        $password=$_POST['pass'];\n\t\n        if($name==\"\" && $fullname==\"\" && $password==\"\")\n\t\t{\n            echo\"please fill in all the information\";\n        }\n        else\n        {\n            $j_qry=$conn->query(\"Insert into tablename(username,fullname,password) values('$name','$fullname','$password')\");\n            if($j_qry)\n            {\n                echo\"regi"
-        },
-        "code_insights": {
-          "code_quality": {
-            "score": 3,
-            "rating": "Beginner",
-            "summary": "The PHP code exhibits several critical quality issues, most notably severe security vulnerabilities like SQL injection and plain-text password storage. Input validation is minimal and ineffective. There's a lack of separation of concerns, with business logic and presentation heavily intertwined. JavaScript code for the frontend is functional but primarily relies on integrating third-party jQuery plugins without demonstrating complex custom logic. Overall, the code quality is poor, particularly on the backend."
+            "summary": "The code is generally well-structured, with clear comments, proper import handling for optional dependencies, and good use of Streamlit for UI. It demonstrates an understanding of integrating external services like IBM WatsonX and MongoDB. However, some stylistic inconsistencies and a lack of explicit error handling in certain sections could be improved."
           },
           "technical_complexity": {
-            "score": 3,
-            "rating": "Beginner",
-            "summary": "The technical complexity is low. The backend logic involves basic form submission handling, direct database insertions/selections, and session management. There are no advanced data structures, algorithms, or design patterns employed. The frontend uses standard jQuery and common plugins, which reduces the complexity of custom JavaScript development."
+            "score": 6,
+            "rating": "Advanced",
+            "summary": "The codebase integrates multiple complex technologies: Streamlit for UI, IBM WatsonX AI for natural language processing, and MongoDB for data persistence. This involves handling API calls, data serialization, and potentially complex state management within the Streamlit application. The use of conditional imports for optional dependencies adds a layer of robustness but also complexity."
           },
           "architecture_patterns": [
-            "Monolithic (simple script-based)"
+            "Model-View-Controller (MVC) - Streamlit's reactive nature and separation of concerns (UI, backend logic) loosely align with MVC principles.",
+            "Service-Oriented Architecture (SOA) - Interaction with external services like IBM WatsonX and MongoDB can be seen as adopting SOA principles.",
+            "Data Access Layer - Use of PyMongo to interact with MongoDB suggests a data access layer pattern."
           ],
           "skills_demonstrated": [
-            "Basic PHP syntax and control structures (if/else, isset)",
-            "Handling HTTP POST requests and form data",
-            "Basic SQL queries (INSERT, SELECT)",
-            "Basic database interaction (mysqli or PDO object usage, mysqli_real_escape_string)",
-            "HTML5 structure and meta-tags",
-            "CSS framework integration (Bootstrap)",
-            "JavaScript (jQuery) for DOM manipulation and UI enhancements",
-            "Integration of third-party jQuery plugins (meanmenu, tooltips, sticky, NiceScroll, jQuery Validate)",
-            "Basic session management"
+            "Python Programming",
+            "Streamlit (Web Application Framework)",
+            "IBM WatsonX AI (LLM Integration)",
+            "MongoDB (Database Integration)",
+            "API Integration",
+            "Environment Variable Management",
+            "Secrets Management (.streamlit/secrets.toml)",
+            "Error Handling (conditional imports)"
           ],
           "best_practices_used": [
-            "Use of 'mysqli_real_escape_string' (though not sufficient and only used in one file)",
-            "Use of 'header()' for redirection (in 'login.php' only)",
-            "Client-side validation with jQuery Validate (though not fully leveraged in server-side handling)",
-            "Responsive design considerations (viewport meta tag, Bootstrap, meanmenu plugin)"
+            "Clear File Headers and Instructions: Each file starts with a clear header explaining its purpose, quick start instructions, and how to configure secrets.",
+            "Optional Dependency Handling: Gracefully handles cases where `ibm-watsonx-ai` or `pymongo` are not installed using `try-except` blocks.",
+            "Secrets Management: Encourages the use of `.streamlit/secrets.toml` for sensitive credentials.",
+            "Code Modularity: Separates concerns into different files (`medbird_chatbot.py`, `summary_generator.py`).",
+            "Type Hinting: Uses type hints (`typing.Any`, `typing.Dict`, etc.) for better code readability and maintainability (observed in `summary_generator.py`).",
+            "Configuration Helpers: Provides utility functions (`_env_or_secret`) to manage configuration retrieval from environment variables or secrets.",
+            "Streamlit Page Configuration: Uses `st.set_page_config` for setting up the web page title, icon, and layout."
           ],
           "areas_for_improvement": [
-            "**Security (Critical Priority)**:",
-            "-   **Prevent SQL Injection**: Implement prepared statements with parameterized queries for *all* database interactions (`mysqli_prepare` / `PDO::prepare`). The current use of direct variable insertion and `mysqli_real_escape_string` is insufficient and inconsistent.",
-            "-   **Password Hashing**: Store and verify passwords using secure hashing algorithms (e.g., `password_hash()` and `password_verify()` in PHP) instead of plain text.",
-            "-   **Input Sanitization and Validation**: Implement robust server-side validation for all user inputs (e.g., check for empty fields individually, data types, length, format for email/phone). Client-side validation is for UX, not security.",
-            "**Code Structure and Maintainability**:",
-            "-   **Separation of Concerns**: Decouple PHP logic from HTML presentation. Consider using a templating engine or a simple MVC-like structure.",
-            "-   **Centralized Configuration**: Consolidate database connection details and ensure consistent connection object usage (e.g., `$conn` vs `$con`).",
-            "-   **Consistent Redirection**: Use `header('Location: ...')` for all PHP-initiated redirects instead of JavaScript.",
-            "-   **Error Handling**: Provide more specific and user-friendly error messages, and implement server-side error logging.",
-            "**Database Interaction**:",
-            "-   **PDO**: Consider migrating to PDO for a more consistent and flexible database abstraction layer.",
-            "**Frontend**:",
-            "-   **Consolidate JavaScript**: Combine multiple `$(document).ready()` calls into a single block for better organization and potentially minor performance gains."
+            "Consistent Error Handling: While optional dependencies are handled, explicit error handling for API calls (IBM WatsonX, MongoDB) and data processing within the core logic could be strengthened.",
+            "Configuration Validation: Add more robust validation for configuration parameters (e.g., checking if required keys exist in secrets or env vars before attempting to use them).",
+            "Code Style Consistency: Minor inconsistencies observed in formatting and line breaks between the two provided snippets.",
+            "Logging: Implement a more comprehensive logging strategy instead of relying solely on Streamlit's output, especially for debugging complex AI interactions or database operations.",
+            "Docstrings: While comments are present, adding formal docstrings to functions and classes would further enhance documentation and understandability.",
+            "Security: Ensure that API keys and credentials are not hardcoded anywhere and are always managed through environment variables or secrets files, as is being done, but vigilance is key.",
+            "State Management: For more complex Streamlit apps, consider advanced state management techniques if the current approach becomes unwieldy."
           ],
-          "overall_assessment": "This repository demonstrates a foundational understanding of web development using PHP, HTML, CSS, and JavaScript with jQuery. However, the backend code has severe security vulnerabilities (SQL injection, plain-text passwords) and lacks robust input validation, which are critical flaws for any web application. The architectural approach is simple and monolithic. While the frontend integrates various jQuery plugins effectively for UI, the core PHP logic requires significant refactoring to meet modern security and quality standards. This project serves as a basic starting point but is not suitable for production without major security and quality enhancements.",
+          "overall_assessment": "This project demonstrates a solid foundation for building a multi-agent hospital front desk system using modern Python frameworks and cloud services. The integration of Streamlit, IBM WatsonX, and MongoDB is well-executed, with a good focus on developer experience through clear instructions and configuration management. The code exhibits strong senior-level development practices, particularly in its modularity and graceful handling of dependencies. With some attention to refining error handling and ensuring consistent code style, this codebase can be further strengthened.",
           "notable_observations": [
-            "Inconsistent database connection variable names (`$conn` in 'index.php' and 'register.php', `$con` in 'login.php').",
-            "Inconsistent use of `require` vs `include` for configuration files.",
-            "The inclusion of 'jquery.validate.js' suggests an intent for client-side validation, but it's not mirrored by robust server-side validation in the provided PHP snippets.",
-            "The 'index.php' file is a mix of PHP logic and the start of an HTML document, implying it's a 'header' or entry point for a larger, similarly structured application."
+            "The project leverages IBM's Granite model for AI tasks, indicating a focus on powerful NLP capabilities.",
+            "The use of `calendar` and `datetime` modules suggests potential for handling scheduling and time-related logic.",
+            "The `_env_or_secret` helper function is a practical approach to abstracting configuration loading.",
+            "The `ZoneInfo` import with a fallback for older Python versions demonstrates consideration for compatibility.",
+            "The `smtplib` and `email.message` imports hint at potential email notification features, though not fully shown in these snippets."
           ]
         }
       },
       {
-        "name": "PycharmGitHub",
+        "name": "Panic-disorder-classification",
         "description": null,
         "technologies": [
-          "Python"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 1,
-        "last_updated": "2025-09-15T20:58:42Z",
-        "readme": "",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "rolematrix",
-        "description": null,
-        "technologies": [
-          "Python",
-          "Shell"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 4,
-        "last_updated": "2026-02-09T00:01:48Z",
-        "readme": "# Role Matrix - Resume Screening Application\n\nAn intelligent resume screening tool that matches candidate skills against job descriptions and provides interview recommendations.\n\n## Features\n\n\u2705 **Multi-file Resume Upload** - Process multiple PDF/DOCX resumes at once\n\n\u2705 **Skill Extraction** - Automatically extracts 300+ technical and soft skills\n\n\u2705 **Job Description Parsing** - Analyzes JD requirements\n\n\u2705 **Confidence Scoring** - Calculates match percentage\n\n\u2705 **Interview Recommendations** - Auto-categorizes: Interview, Maybe, Not now\n\n\u2705 **Alternate Role Suggestions** - Suggests better-fitting roles for low-match candidates\n\n\u2705 **Candidate Profiles** - Exports structured JSON profiles\n\n\u2705 **Visual Dashboard** - Color-coded results table\n\n## Setup Instructions\n\n### 1. Navigate to Project Directory\n```bash\ncd /Users/dhanushmathivanan/dhanush_gwu/gwu_venture_competition/role-matrix/rolematrix\n```\n\n### 2. Activate Virtual Environment\n```bash\nsource venv/bin/activate  # On macOS/Linux\n# OR\nven",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "siddharth-spyder",
-        "description": null,
-        "technologies": [],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 15,
-        "last_updated": "2026-01-15T23:53:29Z",
-        "readme": "# Siddharth Saravanan \ud83d\udc4b \n\n<p align=\"left\">\n<a href=\"https://www.linkedin.com/in/siddharth-saravanan/\"><img src=\"https://img.shields.io/badge/-LinkedIn-0077B5?style=flat-square&logo=Linkedin&logoColor=white\"/></a>\n<a href=\"mailto:siddharthsaravanan27@gmail.com\"><img src=\"https://img.shields.io/badge/-Gmail-D14836?style=flat-square&logo=Gmail&logoColor=white\"/></a>\n<a href=\"https://medium.com/@siddharthsaravanan27\"><img src=\"https://img.shields.io/badge/-Medium-12100E?style=flat-square&logo=Medium&logoColor=white\"/></a>\n<img src=\"https://komarev.com/ghpvc/?username=siddharth-spyder&color=blueviolet&style=flat-square&label=PROFILE+VIEWS\" alt=\"Visitor Badge\"/>\n</p>\n\nI am a Data Systems Engineer and Full-Stack Developer with a background in Computer Science and an MS in Data Science from George Washington University. I specialize in building end-to-end intelligent systems, ranging from multi-agent AI orchestrations to scalable web architectures.\n\nI enjoy the challenge of taking messy, unstr",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "siddharth-spyder.github.io",
-        "description": null,
-        "technologies": [
+          "Jupyter Notebook",
           "HTML",
-          "CSS",
-          "JavaScript"
+          "Python",
+          "CSS"
         ],
         "source": "github",
         "stars": 0,
         "forks": 0,
-        "commit_count": 5,
-        "last_updated": "2025-09-26T05:17:01Z",
-        "readme": "",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "The-Extrapolats",
-        "description": "Dating Platform Behavior & Prediction Analysis",
-        "technologies": [
-          "HTML"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 5,
-        "last_updated": "2025-09-24T20:03:27Z",
-        "readme": "# The-Extrapolats\nDating Platform Behavior &amp; Prediction Analysis\nThis group is meant to be a collaboration space for Group No.3 in DATS6101 Introduction to Data Science for Fall 2024. Professor Name : Divya Narula P\n\nMidterm: Dataset Name : OkCupid Dataset\n\nFinal Project: Dataset Name : Marriage Proposal Dataset\n\nContributions in : https://github.com/Harshith-Maddala/The_Extrapolats\n",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "Virtual-Police-Station",
-        "description": null,
-        "technologies": [
-          "PHP",
-          "CSS",
-          "JavaScript",
-          "Hack"
-        ],
-        "source": "github",
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 26,
-        "last_updated": "2025-11-18T15:31:24Z",
-        "readme": "# \ud83d\ude94 Virtual Police Station - Tamil Nadu Government\n\nA comprehensive web-based platform for online complaint registration and management system built with modern web technologies. This digital solution brings transparency, efficiency, and accessibility to law enforcement services for the citizens of Tamil Nadu.\n\n## \u2728 Features\n\n### \ud83c\udfdb\ufe0f **Government-Grade Security & Compliance**\n- Official Tamil Nadu Government themed interface\n- Secure user authentication with password hashing\n- Session management and data protection\n- Multi-language support (Tamil, Hindi, English)\n\n### \ud83d\udc65 **Dual User System**\n- **Guest Complaints**: File complaints without registration\n- **Registered Users**: Enhanced tracking and dashboard access\n- **Admin Panel**: Complete complaint management system\n- **Role-based access control**\n\n### \ud83d\udcf1 **Modern User Experience**\n- Responsive design that works on all devices\n- Real-time complaint status tracking\n- Interactive dashboard with statistics\n- Evidence photo upload with prev",
+        "commit_count": 16,
+        "last_updated": "2025-07-17T15:23:37Z",
+        "readme": "\ud83d\udd52 Originally built in 2020. Uploaded to GitHub for portfolio showcase.\n# Identifying panic disorder among patients using machine learning\nhttps://github.com/aniruddh996/mlproject2/assets/46890202/b770c81e-7631-44cf-8b1d-92921ee14288\n\nIn the realm of mental health, accurately identifying panic disorder plays a vital role in providing timely support and intervention. In this project, I tackled the task of binary classification, aiming to detect panic disorder based on given data.\n\nTo kickstart the project, I obtained a dataset from Kaggle and embarked on a journey of exploration and analysis. However, I encountered an obstacle along the way - the data was imbalanced. Undeterred, I leveraged multiple algorithms and implemented balanced class weights to ensure fair evaluation of their performance.\n\nI meticulously assessed various metrics, including accuracy, precision, recall, and the F1 score, to gauge the effectiveness of the algorithms. After thorough experimentation, I found that the R",
         "topics": [],
         "has_live_demo": false,
         "homepage": null,
         "is_fork": false,
         "code_samples": {
-          "admin/admin_dashboard.php": "<?php\nrequire_once '../config.php';\n\n// Check if admin is logged in\nif (!isset($_SESSION['admin_id'])) {\n    header('Location: admin_login.php');\n    exit;\n}\n\n$page_title = 'Admin Dashboard - Virtual Police Station';\n\n// Handle status updates\nif ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {\n    $complaint_id = $_POST['complaint_id'];\n    $new_status = $_POST['status'];\n    $remarks = trim($_POST['remarks']);\n    \n    try {\n        $stmt = $pdo->prepare(\"UPDATE compla",
-          "admin/admin_login.php": "<?php\nrequire_once '../config.php';\n$page_title = 'Admin Login - Virtual Police Station';\n\n$message = '';\n$message_type = '';\n\nif ($_SERVER['REQUEST_METHOD'] == 'POST') {\n    $username = trim($_POST['username']);\n    $password = $_POST['password'];\n    \n    if (empty($username) || empty($password)) {\n        $message = 'Please enter both username and password.';\n        $message_type = 'error';\n    } else {\n        try {\n            $stmt = $pdo->prepare(\"SELECT id, username, password_hash FROM ",
-          "admin/admin_logout.php": "<?php\nsession_start();\nunset($_SESSION['admin_id']);\nunset($_SESSION['admin_username']);\nheader('Location: admin_login.php?message=logged_out');\nexit;\n?>",
-          "admin/create_admin.php": "<?php\nrequire_once '../config.php';\n\n// Generate password hash for admin123\n$password = 'admin123';\n$password_hash = password_hash($password, PASSWORD_DEFAULT);\n\necho \"Password hash for 'admin123': \" . $password_hash . \"<br>\";\n\n// Check if admin user exists and update/create\ntry {\n    $stmt = $pdo->prepare(\"SELECT id FROM admin_users WHERE username = ?\");\n    $stmt->execute(['admin']);\n    $admin = $stmt->fetch();\n    \n    if ($admin) {\n        // Update existing admin\n        $stmt = $pdo->prep",
-          "complaint.php": "<?php\nrequire_once 'config.php';\n$page_title = 'File Complaint - Virtual Police Station';\n\n$message = '';\n$message_type = '';\n\nif ($_SERVER['REQUEST_METHOD'] == 'POST') {\n    $name = trim($_POST['name']);\n    $email = trim($_POST['email']);\n    $phone = trim($_POST['phone']);\n    $complaint_type = $_POST['complaint_type'];\n    $description = trim($_POST['description']);\n    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;\n    \n    // Debug: Check if files are being uploaded\n"
+          "app.py": "from flask import Flask, render_template, request\r\nimport pandas as pd\r\nimport pickle\r\n\r\napp = Flask(__name__)\r\n\r\n# Load the trained model and vectorizer\r\nwith open(\"model.pickle\", \"rb\") as f:\r\n    model = pickle.load(f)\r\n\r\n# Define the list of questions and their corresponding column names\r\nquestions = {\r\n    'Age': \"What is the participant's age?\",\r\n    'Gender': \"What is the participant's gender?\",\r\n    'Family History': \"Does the participant have a family history of panic disorder? (Yes/No)\""
         },
         "code_insights": {
           "code_quality": {
             "score": 6,
             "rating": "Intermediate",
-            "summary": "The code is generally readable and uses clear variable names, indicating an intermediate understanding of PHP. It leverages `require_once` for configuration and includes basic error handling with `try-catch` blocks for database operations. However, there's a lack of consistent input sanitization across all user-supplied data, the architecture is largely procedural without strict separation of concerns, and debugging `error_log` statements are present in what appears to be production code. Code quality is also hampered by several security vulnerabilities and the presence of utility scripts that should be secured or removed."
+            "summary": "The code is generally clear, uses standard Python imports, and initializes a Flask application in a straightforward manner. It utilizes a context manager for file handling, which is a good practice. However, the provided 'questions' dictionary is incomplete, suggesting a potential syntax error or truncated file. There is no explicit error handling for critical operations like loading the model file. The use of `pickle` for model serialization, while common in ML, poses a security risk if the source of the pickled file is not fully trusted."
           },
           "technical_complexity": {
-            "score": 4,
+            "score": 3,
             "rating": "Beginner",
-            "summary": "The application's technical complexity is relatively low. It primarily involves standard CRUD (Create, Read, Update, Delete) operations for complaints and admin users, basic session-based authentication, and file uploads. There are no complex algorithms, advanced data structures, or intricate design patterns employed. The logic for each page is straightforward and follows a linear execution flow."
+            "summary": "The technical complexity is low. The snippet demonstrates basic Flask application setup, simple file I/O for model loading, and definition of a Python dictionary. No advanced data structures, algorithms, or complex integration patterns are present. It's a foundational setup for a web application."
           },
           "architecture_patterns": [
-            "Procedural (with page controller style)",
-            "Layered (implicit separation for config/database)"
+            "Monolithic: The application appears to follow a single-service, single-file monolithic structure, at least in this initial view.",
+            "Client-Server (Web Application): Implies a standard web application architecture where a client interacts with the Flask server."
           ],
           "skills_demonstrated": [
-            "PHP (procedural programming)",
-            "PDO for database interaction (MySQL/MariaDB)",
-            "SQL query writing (SELECT, UPDATE, Aggregate Functions like COUNT, SUM, CASE)",
-            "HTML/CSS integration (implied)",
-            "Session Management",
-            "Form Handling and Validation (basic)",
-            "Strong Password Hashing and Verification (password_hash, password_verify)",
-            "File Uploads (basic implementation)",
-            "Basic error handling with try-catch blocks"
+            "Python programming fundamentals (variables, dictionaries, file I/O).",
+            "Basic Flask web framework usage (app initialization, importing modules).",
+            "Machine learning model serialization/deserialization using `pickle`.",
+            "Understanding of basic web application structure."
           ],
           "best_practices_used": [
-            "Strong password hashing using `password_hash()` and `password_verify()` for admin authentication.",
-            "Use of prepared statements for sensitive database write operations (`UPDATE`, `INSERT`) to mitigate SQL injection.",
-            "Session-based authentication for controlling admin access.",
-            "Basic input trimming (`trim()`) for user-submitted data.",
-            "Crucial `is_uploaded_file()` check to validate file uploads.",
-            "Basic access control (`if (!isset($_SESSION['admin_id']))`) for authenticated areas."
+            "Using a context manager (`with open(...) as f:`) for safe file handling, ensuring the file is properly closed.",
+            "Clear and descriptive variable names (`app`, `model`, `questions`)."
           ],
           "areas_for_improvement": [
-            "**Comprehensive Input Validation and Sanitization:** Implement robust validation and sanitization for all user inputs (e.g., complaint descriptions, remarks, email, phone) to prevent XSS attacks and ensure data integrity. Escaping output when displaying user-generated content is critical.",
-            "**Robust File Upload Security:** Enhance file upload security by validating MIME types, enforcing file size limits, sanitizing filenames to prevent malicious file execution (e.g., double extensions) and directory traversal, and storing uploaded files outside the web root or with randomized, non-guessable filenames.",
-            "**CSRF Protection:** Implement CSRF tokens for all POST requests to protect against Cross-Site Request Forgery attacks, especially for critical actions like updating complaint status.",
-            "**Improved Error Handling and User Feedback:** Remove debug-specific `error_log` statements from production code. Provide more user-friendly error messages instead of raw database errors, and implement a consistent error logging strategy.",
-            "**Code Organization and Architecture:** Refactor the code to separate concerns more effectively, potentially moving towards a basic MVC pattern or at least using functions/classes for business logic, data access, and presentation to improve maintainability and scalability.",
-            "**Secure Utility Scripts:** The `create_admin.php` script, which hardcodes a default admin password, should be removed or highly secured (e.g., behind authentication or only accessible via CLI) after initial setup to prevent unauthorized admin creation/reset.",
-            "**Consistent Database Interaction:** Adopt a consistent approach to database interaction, preferably using prepared statements for all queries, even simple `SELECT` statements, as a robust security practice.",
-            "**Configuration Management:** Centralize and secure sensitive configurations, ensuring default credentials or setup-specific information are not publicly accessible or hardcoded in deployed code."
+            "**Code Completeness and Correctness:** The `questions` dictionary is truncated and needs to be completed to resolve the syntax error.",
+            "**Error Handling:** Implement robust error handling for file operations (e.g., `model.pickle` not found, permission errors) and potential issues during model deserialization.",
+            "**Security (Pickle):** Reconsider `pickle` for model serialization, especially if the model file's origin cannot be fully trusted, as deserializing untrusted pickled data can lead to arbitrary code execution. Explore safer alternatives like ONNX, joblib with `safe=True`, or custom, more secure serialization formats.",
+            "**Configuration Management:** Externalize 'magic strings' like the model filename (\"model.pickle\") into a configuration file or environment variables for easier management and deployment.",
+            "**Modularity:** For a growing application, consider separating concerns into different modules (e.g., `routes.py`, `models.py`, `config.py`) to improve organization and maintainability.",
+            "**Logging:** Implement a logging mechanism to record application events, warnings, and errors for better debugging and monitoring.",
+            "**Input Validation:** (Inferred future need) As this application will likely process user input, robust input validation will be crucial to prevent errors and security vulnerabilities.",
+            "**Documentation/Comments:** Add comments to explain the purpose of the 'questions' dictionary, the expected data types for the model, and any non-obvious logic."
           ],
-          "overall_assessment": "The 'Virtual-Police-Station' project demonstrates a foundational understanding of PHP, SQL, and web application development. It successfully implements core functionalities like admin login with strong password hashing and complaint submission. While the project is a good starting point, it exhibits several critical security vulnerabilities, particularly in input validation, sanitization, and file upload handling, which would make it unsuitable for a production environment without significant security hardening. The architectural style is predominantly procedural, which is functional for small projects but lacks the maintainability and scalability benefits of more modern patterns. It represents an intermediate developer's attempt at building a web application, strong in some areas (password security) but weak in others (input/file security)."
+          "overall_assessment": "This code snippet provides a basic, functional starting point for a Flask web application that integrates a machine learning model for panic disorder classification. It demonstrates fundamental Python and Flask skills. However, it requires significant enhancements in terms of completeness, error handling, security, and robustness to be considered production-ready. It serves well as a proof-of-concept or an initial development phase."
+        }
+      },
+      {
+        "name": "Roman-urdu-Sentiment-Analyzer",
+        "description": null,
+        "technologies": [
+          "Jupyter Notebook",
+          "Python",
+          "HTML"
+        ],
+        "source": "github",
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 10,
+        "last_updated": "2020-07-02T12:18:44Z",
+        "readme": "# Roman-urdu-Sentiment-Analyzer\n\n### About the project\nUnderstanding an overview of wider public opinion behind certain topics is essential despite languages in order to measure the rate of increase in product management. But finding an emotion of a comment based on a certain language has always been a challenge. This Web application focuses on finding emotions in a user defined Urdu comment and provides the result instantaenously.\n \n### Development plan\n I used Support Vector Classifier to accomplish the classification of different emotions by training the data that was taken from https://archive.ics.uci.edu/ml/datasets/Roman+Urdu+Data+Set. Then I implemented Flask which is a microweb framework that intergates web app with python code. This goes along with stylesheets, html code and js files that were downloaded from https://materializecss.com/getting-started.html. There is also an Ipython notebook that speaks more about an in-depth construction and visualizaion of the model.  \n \n### ",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {
+          "app.py": "from flask import Flask,render_template, request\r\nimport pickle\r\nfrom sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer\r\nimport re\r\nfrom nltk.tokenize import word_tokenize\r\n\r\n\r\napp = Flask(__name__)\r\n\r\nmodel = pickle.load(open('model_pickle', 'rb'))\r\nvec = pickle.load(open('vector_pickle','rb'))\r\n\r\n@app.route('/')\r\ndef form():\r\n    return render_template('sentiment.html')\r\n\r\ndef text_process(text):\r\n  return \" \".join(re.sub(\"(@[A-Za-z0-9]+)|([^0-9A-Za-z \\t])\", \" \",str(text",
+          "sentiment_analysis.py": "import pandas as pd\r\n\r\nfrom sklearn import svm\r\nfrom nltk.tokenize import word_tokenize\r\nfrom sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer\r\nfrom sklearn.preprocessing import LabelEncoder\r\nfrom sklearn.model_selection import train_test_split\r\nimport re\r\nimport pickle \r\n#loading data\r\ndf = pd.read_csv(\"roman_urdu.csv\")\r\ndf.columns = ['comment','sentiment', 'nan']\r\n# dropping the columns and missing values \r\ndf.drop(columns = ['nan'], axis = 1, inplace=True)\r\ndf = df.drop"
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 5,
+            "rating": "Intermediate",
+            "summary": "The code is functional and achieves its stated purpose. However, there's a lack of robust error handling, extensive commenting, and clear separation of concerns in some areas. Variable naming is generally clear, but some functions could be more modular. The use of pickle for model and vector storage is a simplification that might not be ideal for production environments due to versioning and security concerns."
+          },
+          "technical_complexity": {
+            "score": 6,
+            "rating": "Intermediate",
+            "summary": "The project involves common machine learning workflows: data loading and cleaning, text preprocessing, feature extraction (CountVectorizer/TfidfTransformer), model training (SVM), and deployment via Flask. The complexity is moderate, with the core challenge being effective Roman Urdu text processing and sentiment classification. The integration of NLTK for tokenization and regex for cleaning adds a layer of complexity."
+          },
+          "architecture_patterns": [
+            "Model-View-Controller (implied for Flask app)",
+            "Data Preprocessing Pipeline"
+          ],
+          "skills_demonstrated": [
+            "Python",
+            "Flask",
+            "Scikit-learn",
+            "Pandas",
+            "NLTK",
+            "Pickle",
+            "Regular Expressions",
+            "Sentiment Analysis",
+            "Text Preprocessing"
+          ],
+          "best_practices_used": [
+            "Using Flask for web framework",
+            "Leveraging Scikit-learn for ML tasks",
+            "Employing Pandas for data manipulation",
+            "Applying NLTK for text processing",
+            "Using regex for text cleaning",
+            "Splitting training and serving logic (implicitly)",
+            "Basic data cleaning and preprocessing steps"
+          ],
+          "areas_for_improvement": [
+            "Add comprehensive error handling (e.g., for file loading, model prediction).",
+            "Implement more robust model and vector serialization (e.g., using joblib or saving to a more version-controlled format).",
+            "Consider a more structured approach to text preprocessing, potentially using a dedicated preprocessing module.",
+            "Improve modularity in `app.py` by moving prediction logic into a separate function or class.",
+            "Add unit tests for preprocessing functions and the prediction endpoint.",
+            "Expand the stopwords list or use a more sophisticated stopword removal technique.",
+            "Document the code with docstrings, explaining function purposes, arguments, and return values.",
+            "Refactor the `sentiment_analysis.py` script to be a reusable module rather than a standalone script with inline training.",
+            "Address the duplicated `text_process` and `stopwords` definitions in both files.",
+            "Consider alternative feature extraction methods beyond CountVectorizer and TfidfTransformer.",
+            "The `predict` route in `app.py` is incomplete, needs implementation.",
+            "The `i = df[df['sentiment'] == 'Neative'].index` line in `sentiment_analysis.py` has a typo ('Neative' should likely be 'Negative')."
+          ],
+          "overall_assessment": "This repository provides a functional prototype for a Roman Urdu sentiment analyzer. The core logic for text processing and sentiment classification is present, and the Flask application serves as a basic interface. However, the project shows signs of early development, with a need for more robust engineering practices, better code organization, and enhanced error handling to be production-ready. The duplication of preprocessing code and the incomplete `predict` route are key areas needing immediate attention.",
+          "notable_observations": [
+            "The project successfully tackles the challenge of sentiment analysis on Roman Urdu text, which is less common than standard Urdu or English.",
+            "The use of `pickle` for model serialization is a common, albeit potentially problematic, approach for quick prototyping.",
+            "The custom stopwords list is specific to Roman Urdu and demonstrates an understanding of the language's nuances.",
+            "The `sentiment_analysis.py` script contains a clear data loading, cleaning, and preprocessing pipeline.",
+            "There is a noticeable duplication of `text_process` function and `stopwords` list between `app.py` and `sentiment_analysis.py`, indicating a potential for refactoring.",
+            "The `predict` route in `app.py` is defined but not implemented."
+          ]
+        }
+      },
+      {
+        "name": "youtube-comment-sentiment-analysis-nlp",
+        "description": null,
+        "technologies": [
+          "Jupyter Notebook",
+          "Python"
+        ],
+        "source": "github",
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 6,
+        "last_updated": "2025-09-05T00:12:27Z",
+        "readme": "# YouTube Sentiment API (AWS Lambda)\n\nServerless REST API that predicts the sentiment of a YouTube comment using a from\u2011scratch Multinomial Naive Bayes model. The model is (re)trained from a labeled CSV in S3 on cold start and served via Amazon API Gateway \u2192 AWS Lambda.\n\n# Features\n\nServerless inference (API Gateway \u2192 Lambda)\n\nFrom\u2011scratch Naive Bayes (Laplace smoothing)\n\nTraining data in S3 (Comment, Sentiment columns)\n\nSimple HTTP POST interface (JSON)\n\nWorks with Postman / curl\n\n# API \n\n#### Endpoint: \nhttps://kfks2dfrmg.execute-api.us-east-1.amazonaws.com/predict?\n\n#### Request Body: \n{\n  \"comment\": \"This video is amazing! Loved the editing and pacing.\"\n}\n\n#### Success Response\n{\n\"input_comment\": \"This video is amazing! Loved the editing and pacing.\",\n\"predicted_sentiment\": \"positive\"\n}\n\n",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {
+          "lambda_handler.py": "import json\r\nimport boto3\r\nimport pandas as pd\r\nimport io\r\nimport math\r\nfrom collections import defaultdict\r\n\r\n# Initialize S3 client\r\ns3 = boto3.client('s3')\r\n\r\n# Naive Bayes Classifier\r\nclass NaiveBayesClassifier:\r\n    def __init__(self):\r\n        self.class_word_counts = defaultdict(lambda: defaultdict(int))\r\n        self.class_counts = defaultdict(int)\r\n        self.vocab = set()\r\n        self.total_docs = 0\r\n\r\n    def train(self, data):\r\n        for text, label in data:\r\n            words ="
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 7,
+            "rating": "Intermediate",
+            "summary": "The code is generally well-structured and functional. It implements a basic Naive Bayes classifier and integrates with AWS Lambda and S3. Variable names are clear, and the logic is straightforward. Some areas could be improved with more robust error handling and potential optimizations."
+          },
+          "technical_complexity": {
+            "score": 5,
+            "rating": "Intermediate",
+            "summary": "The implementation of the Naive Bayes classifier involves probability calculations and basic text processing. The integration with AWS Lambda and S3 adds a layer of cloud infrastructure complexity. Overall, it's a moderately complex task suitable for an intermediate developer."
+          },
+          "architecture_patterns": [
+            "Event-Driven Architecture (AWS Lambda)",
+            "Serverless Computing"
+          ],
+          "skills_demonstrated": [
+            "Python",
+            "Natural Language Processing (NLP)",
+            "Machine Learning (Naive Bayes)",
+            "AWS Lambda",
+            "AWS S3",
+            "Pandas",
+            "Data Preprocessing",
+            "Algorithm Implementation"
+          ],
+          "best_practices_used": [
+            "Use of `defaultdict` for efficient counting",
+            "Lowercasing text for case-insensitivity",
+            "Log probabilities for numerical stability",
+            "Basic smoothing (add-one smoothing implied in calculation)",
+            "Clear separation of training and prediction logic",
+            "AWS SDK (`boto3`) for cloud interaction"
+          ],
+          "areas_for_improvement": [
+            "More comprehensive error handling (e.g., for S3 object not found, invalid CSV format)",
+            "Text preprocessing: remove stop words, stemming/lemmatization",
+            "Feature engineering: consider n-grams instead of unigrams",
+            "Model evaluation: add metrics like accuracy, precision, recall",
+            "Hyperparameter tuning (though Naive Bayes has fewer hyperparameters)",
+            "More robust vocabulary handling for out-of-vocabulary words during prediction",
+            "Consider using libraries like scikit-learn for a more optimized and feature-rich Naive Bayes implementation, especially for larger datasets.",
+            "Add docstrings to explain functions and classes.",
+            "Configuration management: bucket name and key could be environment variables.",
+            "Potentially split the `train` and `predict` logic into separate functions/methods or even separate files/modules for better organization if the model becomes more complex."
+          ],
+          "overall_assessment": "This code provides a functional, albeit basic, sentiment analysis model using Naive Bayes deployed as an AWS Lambda function. It demonstrates a good understanding of core NLP concepts and cloud integration. The implementation is a good starting point but would benefit from enhancements in preprocessing, error handling, and potentially leveraging more mature ML libraries for production readiness.",
+          "notable_observations": [
+            "The Naive Bayes implementation is a simple unigram model without advanced preprocessing.",
+            "The `lambda_handler` function is designed to be the entry point for AWS Lambda, indicating a serverless deployment strategy.",
+            "Data loading is handled via S3, suggesting a common pattern for accessing data in cloud environments.",
+            "The `predict` method uses log probabilities to prevent underflow issues with small probabilities.",
+            "The `class_word_counts` structure is a nested dictionary, which is efficient for this task."
+          ]
         }
       }
     ],
     "from_portfolio": []
   },
   "github_profile": {
-    "username": "siddharth-spyder",
+    "username": "aniruddh996",
     "bio": null,
-    "website": "https://siddharthsresume.000webhostapp.com/index.html",
+    "website": "",
     "followers": 1,
-    "following": 3,
-    "public_repos": 13,
-    "github_url": "https://github.com/siddharth-spyder",
+    "following": 0,
+    "public_repos": 6,
+    "github_url": "https://github.com/aniruddh996",
     "top_repos": [
       {
-        "name": "Bitcamp_Steganalysis",
+        "name": "dermachecker-skin-lesion-classifier",
+        "description": "Melanoma classification using CNN (transfer learning)",
+        "languages": [
+          "Jupyter Notebook",
+          "Python"
+        ],
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 11,
+        "last_updated": "2025-09-04T22:41:09Z",
+        "readme_preview": "# dermachecker-skin-lesion-classifier\nMelanoma classification using CNN (transfer learning)\n\n## Overview\n\nDermachecker is a deep-learning-powered image classification app built to classify skin lesion images into one of seven categories.\nThe model is based on DenseNet121 and fine-tuned on a dermoscopic skin image dataset.\n\nhttps://github.com/user-attachments/assets/bd6800d7-f960-44eb-9eb5-c34e8209abb6\n\n\n\nThis was a personal project I worked on a few years ago to explore AI in healthcare and medical image classification. Recently, I refreshed the repository and added an interactive inference app built using Streamlit.\n\n## Features\n\ud83e\udde0 Deep Learning Model \u2014 DenseNet121 fine-tuned for multiclass classification\n\n\ud83e\ude7b 7 Skin Lesion Classes:\n\nActinic keratoses\n\nBasal cell carcinoma\n\nBenign keratosis-like lesions\n\nDermatofibroma\n\nVascular lesions\n\nMelanocytic nevi\n\n\ud83d\uddbc Interactive App \u2014 Upload an image and get instant classification results\n\n\n\n\n",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {
+          "app.py": "# app.py\r\nimport io, base64\r\nfrom PIL import Image\r\nfrom flask import Flask, request, jsonify, render_template_string\r\nimport torch\r\nimport torch.nn as nn\r\nfrom torchvision import models, transforms\r\n\r\n# ------- config -------\r\n# Your exact mapping (index -> label)\r\nIDX_TO_LABEL = {\r\n    2: 'Benign keratosis-like lesions ',\r\n    4: 'Melanocytic nevi',\r\n    3: 'Dermatofibroma',\r\n    6: 'Dermatofibroma',\r\n    5: 'Vascular lesions',\r\n    1: 'Basal cell carcinoma',\r\n    0: 'Actinic keratoses',\r\n}\r\nN",
+          "ml-model.py": "# app.py\r\nimport io\r\nfrom typing import Dict, Any, Optional\r\n\r\nimport streamlit as st\r\nfrom PIL import Image\r\nimport torch\r\nimport torch.nn as nn\r\nfrom torchvision import models, transforms\r\n\r\n# ---------------- Config ----------------\r\n# Your exact mapping (index -> label)\r\nIDX_TO_LABEL: Dict[int, str] = {\r\n    2: 'Benign keratosis-like lesions ',\r\n    4: 'Melanocytic nevi',\r\n    3: 'Dermatofibroma',\r\n    6: 'Dermatofibroma',\r\n    5: 'Vascular lesions',\r\n    1: 'Basal cell carcinoma',\r\n    0: '"
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 6,
+            "rating": "Intermediate",
+            "summary": "The code is functional for its intended purpose of image classification, but lacks robust error handling, comprehensive documentation, and separation of concerns. Some configuration is hardcoded and could be externalized. Type hinting is present in `ml-model.py`, which is good."
+          },
+          "technical_complexity": {
+            "score": 5,
+            "rating": "Intermediate",
+            "summary": "The core logic involves loading a pre-trained PyTorch model (DenseNet121) and performing inference on user-provided images. This requires understanding of deep learning frameworks, image processing, and web/app development basics. The integration of these components adds moderate complexity."
+          },
+          "architecture_patterns": [
+            "Model-View-Controller (implied)",
+            "Client-Server (for app.py)",
+            "API (for app.py)"
+          ],
+          "skills_demonstrated": [
+            "Python",
+            "PyTorch",
+            "TensorFlow (implied if used for training)",
+            "Torchvision",
+            "Flask (for app.py)",
+            "Streamlit (for ml-model.py)",
+            "Image Processing (PIL)",
+            "Web Development (basic HTML/JS for app.py)",
+            "Deployment Concepts (model loading, device management)"
+          ],
+          "best_practices_used": [
+            "Using `torch.no_grad()` during inference (implied by `model.eval()`)",
+            "Predefined transforms for consistent preprocessing",
+            "Separation of model loading and application logic",
+            "Type hinting (in ml-model.py)",
+            "Using environment variables or config for paths (potential, but not fully implemented)",
+            "Model evaluation mode (`model.eval()`)",
+            "Caching model loading (in ml-model.py with `st.cache_resource`)"
+          ],
+          "areas_for_improvement": [
+            "Error Handling: Add more robust error handling for file uploads, model loading, and inference. For example, what happens if `best_model_weights.pt` is missing or corrupted?",
+            "Configuration Management: Externalize configuration like model paths, device settings, and potentially `IDX_TO_LABEL` into a configuration file (e.g., `.env`, `config.yaml`) instead of hardcoding them in the script.",
+            "Logging: Implement logging to track application events, errors, and performance.",
+            "Code Documentation: Add more docstrings to functions and classes, especially to explain complex logic or parameters.",
+            "Input Validation: Validate the uploaded image format and size before attempting to process it.",
+            "Security: For `app.py`, ensure the HTML template is sanitized if user-generated content is ever displayed. Sanitize file uploads to prevent malicious file execution. Consider rate limiting if deployed publicly.",
+            "Modularity: The HTML template in `app.py` is embedded as a string. For larger applications, it's better to use separate HTML files and Flask's templating engine (Jinja2).",
+            "Dependency Management: Use a `requirements.txt` or `pyproject.toml` to list all dependencies.",
+            "Device Management Flexibility: While `DEVICE = torch.device('cpu')` is a good default, explicitly checking for CUDA availability and allowing user override would be better.",
+            "Model Loading Robustness (`ml-model.py`): The `load_model_from_source` function could be more robust in handling different ways of loading checkpoints (e.g., directly from bytes vs. path) and providing clearer feedback if loading fails."
+          ],
+          "overall_assessment": "The code provides a functional starting point for a skin lesion classification application using PyTorch. It demonstrates a solid understanding of deep learning model deployment with common web frameworks (Flask) and data science application builders (Streamlit). The core model loading and inference logic is sound. However, significant improvements can be made in terms of robustness, maintainability, security, and user experience through better error handling, configuration management, and code organization. The inclusion of type hints in `ml-model.py` is a positive step towards better code quality.",
+          "notable_observations": [
+            "Two separate files (`app.py` and `ml-model.py`) are provided, suggesting the project might be targeting different deployment scenarios (e.g., Flask API vs. Streamlit app).",
+            "The `IDX_TO_LABEL` mapping has duplicate labels ('Dermatofibroma'), which might indicate a preprocessing or labeling issue during training, or it's intentional for some reason. This should be clarified.",
+            "Hardcoding the model path and device is a common simplification, but for production, these should be configurable.",
+            "`torch.set_num_threads(1)` in `app.py` is likely to prevent potential multi-threading issues within PyTorch, which can be relevant for CPU inference performance.",
+            "The use of `st.cache_resource` in `ml-model.py` is an excellent practice for Streamlit applications to avoid reloading the model on every user interaction."
+          ]
+        }
+      },
+      {
+        "name": "image-steganalayiss-CNN",
+        "description": "Image steganalysis using traditional CNN model",
+        "languages": [
+          "Jupyter Notebook",
+          "Python",
+          "HTML"
+        ],
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 3,
+        "last_updated": "2025-09-04T22:43:55Z",
+        "readme_preview": "We've developed a groundbreaking model that can instantly determine if an image contains a hidden message. With 95% accuracy, our technology analyzes digital images to detect subtle steganographic traces that are invisible to the human eye.\r\nImagine being able to scan through thousands of images and identify which ones might be concealing secret information - that's exactly what our model does. Perfect for cybersecurity, digital forensics, and protecting sensitive information.\r\nIn just milliseconds, we can tell you: Is there a secret message hiding in this image?\u00a0Yes\u00a0or\u00a0no.\r\n",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {},
+        "code_insights": {}
+      },
+      {
+        "name": "medbird-multi-agent-hospital-front-desk-system",
+        "description": "A multi-agent hospital front desk system that automates patient intake, appointment booking, clinical summary generation, cost estimation, and notifications \u2014 streamlining workflows for both patients and healthcare staff.",
+        "languages": [
+          "Python"
+        ],
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 27,
+        "last_updated": "2025-09-04T23:22:02Z",
+        "readme_preview": "# MedBird \u2014 Agentic Appointment & Intake (IBM watsonx)\n\n### Submission for the IBM TechXchange 2025 Pre-Conference watsonx Hackathon (Agentic AI track).\n\nMedBird is an AI front-desk assistant for clinics. It books appointments from natural language, validates contact info, stores to MongoDB, emails the patient a confirmation, and generates a concise doctor-ready summary.\n\n### Agent 1 \nBooking & Notifications: Streamlit chatbot + MongoDB + SMTP email\n\n### Agent 2 \nClinical Summary: Fixed-format patient summary for doctors (Streamlit)\n\nAI: IBM watsonx Granite via ModelInference.chat\n\n\n# Demo\n\nhttps://youtu.be/vM9zD4_DfPU\n\n# Why MedBird\n\nScheduling and intake create bottlenecks for clinics. Patients want simple, natural-language booking; doctors want a crisp summary before the visit. MedBird automates both with agentic AI.\n\n# Features\n\nUnderstands free-text symptoms and maps to the right specialist\n\nInterprets time phrases (\u201cMonday 10am\u201d, \u201ctomorrow morning\u201d) within working hours\n\nValidate",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {
+          "apps/medbird_chatbot.py": "# medbird_chatbot.py \u2014 Full Streamlit + watsonx + Mongo (users + appointments)\n# ----------------------------------------------------------------------\n# Quick start:\n#   pip install --upgrade streamlit pymongo ibm-watsonx-ai\n#   python -m streamlit run \"medbird_chatbot.py\"\n#\n# Optional: .streamlit/secrets.toml (same folder as this file)\n# [ibm]\n# api_key    = \"...\"\n# url        = \"https://us-south.ml.cloud.ibm.com\"\n# project_id = \"...\"\n# model_id   = \"ibm/granite-3-3-8b-instruct\"\n# [mongo]\n# ur",
+          "apps/summary_generator.py": "# doctor_summary_agent.py\r\n# -------------------------------------------------\r\n# Quick start:\r\n#   pip install --upgrade streamlit pymongo ibm-watsonx-ai\r\n#   python -m streamlit run \"doctor_summary_agent.py\"\r\n#\r\n# Optional: .streamlit/secrets.toml (same folder)\r\n# [ibm]\r\n# api_key    = \"...\"\r\n# url        = \"https://us-south.ml.cloud.ibm.com\"\r\n# project_id = \"...\"\r\n# [mongo]\r\n# uri = \"...\"\r\n# db  = \"medbird\"\r\n# [clinic]\r\n# tz  = \"America/New_York\"\r\n# -------------------------------------------"
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 7,
+            "rating": "Advanced",
+            "summary": "The code is generally well-structured, with clear comments, proper import handling for optional dependencies, and good use of Streamlit for UI. It demonstrates an understanding of integrating external services like IBM WatsonX and MongoDB. However, some stylistic inconsistencies and a lack of explicit error handling in certain sections could be improved."
+          },
+          "technical_complexity": {
+            "score": 6,
+            "rating": "Advanced",
+            "summary": "The codebase integrates multiple complex technologies: Streamlit for UI, IBM WatsonX AI for natural language processing, and MongoDB for data persistence. This involves handling API calls, data serialization, and potentially complex state management within the Streamlit application. The use of conditional imports for optional dependencies adds a layer of robustness but also complexity."
+          },
+          "architecture_patterns": [
+            "Model-View-Controller (MVC) - Streamlit's reactive nature and separation of concerns (UI, backend logic) loosely align with MVC principles.",
+            "Service-Oriented Architecture (SOA) - Interaction with external services like IBM WatsonX and MongoDB can be seen as adopting SOA principles.",
+            "Data Access Layer - Use of PyMongo to interact with MongoDB suggests a data access layer pattern."
+          ],
+          "skills_demonstrated": [
+            "Python Programming",
+            "Streamlit (Web Application Framework)",
+            "IBM WatsonX AI (LLM Integration)",
+            "MongoDB (Database Integration)",
+            "API Integration",
+            "Environment Variable Management",
+            "Secrets Management (.streamlit/secrets.toml)",
+            "Error Handling (conditional imports)"
+          ],
+          "best_practices_used": [
+            "Clear File Headers and Instructions: Each file starts with a clear header explaining its purpose, quick start instructions, and how to configure secrets.",
+            "Optional Dependency Handling: Gracefully handles cases where `ibm-watsonx-ai` or `pymongo` are not installed using `try-except` blocks.",
+            "Secrets Management: Encourages the use of `.streamlit/secrets.toml` for sensitive credentials.",
+            "Code Modularity: Separates concerns into different files (`medbird_chatbot.py`, `summary_generator.py`).",
+            "Type Hinting: Uses type hints (`typing.Any`, `typing.Dict`, etc.) for better code readability and maintainability (observed in `summary_generator.py`).",
+            "Configuration Helpers: Provides utility functions (`_env_or_secret`) to manage configuration retrieval from environment variables or secrets.",
+            "Streamlit Page Configuration: Uses `st.set_page_config` for setting up the web page title, icon, and layout."
+          ],
+          "areas_for_improvement": [
+            "Consistent Error Handling: While optional dependencies are handled, explicit error handling for API calls (IBM WatsonX, MongoDB) and data processing within the core logic could be strengthened.",
+            "Configuration Validation: Add more robust validation for configuration parameters (e.g., checking if required keys exist in secrets or env vars before attempting to use them).",
+            "Code Style Consistency: Minor inconsistencies observed in formatting and line breaks between the two provided snippets.",
+            "Logging: Implement a more comprehensive logging strategy instead of relying solely on Streamlit's output, especially for debugging complex AI interactions or database operations.",
+            "Docstrings: While comments are present, adding formal docstrings to functions and classes would further enhance documentation and understandability.",
+            "Security: Ensure that API keys and credentials are not hardcoded anywhere and are always managed through environment variables or secrets files, as is being done, but vigilance is key.",
+            "State Management: For more complex Streamlit apps, consider advanced state management techniques if the current approach becomes unwieldy."
+          ],
+          "overall_assessment": "This project demonstrates a solid foundation for building a multi-agent hospital front desk system using modern Python frameworks and cloud services. The integration of Streamlit, IBM WatsonX, and MongoDB is well-executed, with a good focus on developer experience through clear instructions and configuration management. The code exhibits strong senior-level development practices, particularly in its modularity and graceful handling of dependencies. With some attention to refining error handling and ensuring consistent code style, this codebase can be further strengthened.",
+          "notable_observations": [
+            "The project leverages IBM's Granite model for AI tasks, indicating a focus on powerful NLP capabilities.",
+            "The use of `calendar` and `datetime` modules suggests potential for handling scheduling and time-related logic.",
+            "The `_env_or_secret` helper function is a practical approach to abstracting configuration loading.",
+            "The `ZoneInfo` import with a fallback for older Python versions demonstrates consideration for compatibility.",
+            "The `smtplib` and `email.message` imports hint at potential email notification features, though not fully shown in these snippets."
+          ]
+        }
+      },
+      {
+        "name": "Panic-disorder-classification",
+        "description": null,
+        "languages": [
+          "Jupyter Notebook",
+          "HTML",
+          "Python",
+          "CSS"
+        ],
+        "stars": 0,
+        "forks": 0,
+        "commit_count": 16,
+        "last_updated": "2025-07-17T15:23:37Z",
+        "readme_preview": "\ud83d\udd52 Originally built in 2020. Uploaded to GitHub for portfolio showcase.\n# Identifying panic disorder among patients using machine learning\nhttps://github.com/aniruddh996/mlproject2/assets/46890202/b770c81e-7631-44cf-8b1d-92921ee14288\n\nIn the realm of mental health, accurately identifying panic disorder plays a vital role in providing timely support and intervention. In this project, I tackled the task of binary classification, aiming to detect panic disorder based on given data.\n\nTo kickstart the project, I obtained a dataset from Kaggle and embarked on a journey of exploration and analysis. However, I encountered an obstacle along the way - the data was imbalanced. Undeterred, I leveraged multiple algorithms and implemented balanced class weights to ensure fair evaluation of their performance.\n\nI meticulously assessed various metrics, including accuracy, precision, recall, and the F1 score, to gauge the effectiveness of the algorithms. After thorough experimentation, I found that the R",
+        "topics": [],
+        "has_live_demo": false,
+        "homepage": null,
+        "is_fork": false,
+        "code_samples": {
+          "app.py": "from flask import Flask, render_template, request\r\nimport pandas as pd\r\nimport pickle\r\n\r\napp = Flask(__name__)\r\n\r\n# Load the trained model and vectorizer\r\nwith open(\"model.pickle\", \"rb\") as f:\r\n    model = pickle.load(f)\r\n\r\n# Define the list of questions and their corresponding column names\r\nquestions = {\r\n    'Age': \"What is the participant's age?\",\r\n    'Gender': \"What is the participant's gender?\",\r\n    'Family History': \"Does the participant have a family history of panic disorder? (Yes/No)\""
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 6,
+            "rating": "Intermediate",
+            "summary": "The code is generally clear, uses standard Python imports, and initializes a Flask application in a straightforward manner. It utilizes a context manager for file handling, which is a good practice. However, the provided 'questions' dictionary is incomplete, suggesting a potential syntax error or truncated file. There is no explicit error handling for critical operations like loading the model file. The use of `pickle` for model serialization, while common in ML, poses a security risk if the source of the pickled file is not fully trusted."
+          },
+          "technical_complexity": {
+            "score": 3,
+            "rating": "Beginner",
+            "summary": "The technical complexity is low. The snippet demonstrates basic Flask application setup, simple file I/O for model loading, and definition of a Python dictionary. No advanced data structures, algorithms, or complex integration patterns are present. It's a foundational setup for a web application."
+          },
+          "architecture_patterns": [
+            "Monolithic: The application appears to follow a single-service, single-file monolithic structure, at least in this initial view.",
+            "Client-Server (Web Application): Implies a standard web application architecture where a client interacts with the Flask server."
+          ],
+          "skills_demonstrated": [
+            "Python programming fundamentals (variables, dictionaries, file I/O).",
+            "Basic Flask web framework usage (app initialization, importing modules).",
+            "Machine learning model serialization/deserialization using `pickle`.",
+            "Understanding of basic web application structure."
+          ],
+          "best_practices_used": [
+            "Using a context manager (`with open(...) as f:`) for safe file handling, ensuring the file is properly closed.",
+            "Clear and descriptive variable names (`app`, `model`, `questions`)."
+          ],
+          "areas_for_improvement": [
+            "**Code Completeness and Correctness:** The `questions` dictionary is truncated and needs to be completed to resolve the syntax error.",
+            "**Error Handling:** Implement robust error handling for file operations (e.g., `model.pickle` not found, permission errors) and potential issues during model deserialization.",
+            "**Security (Pickle):** Reconsider `pickle` for model serialization, especially if the model file's origin cannot be fully trusted, as deserializing untrusted pickled data can lead to arbitrary code execution. Explore safer alternatives like ONNX, joblib with `safe=True`, or custom, more secure serialization formats.",
+            "**Configuration Management:** Externalize 'magic strings' like the model filename (\"model.pickle\") into a configuration file or environment variables for easier management and deployment.",
+            "**Modularity:** For a growing application, consider separating concerns into different modules (e.g., `routes.py`, `models.py`, `config.py`) to improve organization and maintainability.",
+            "**Logging:** Implement a logging mechanism to record application events, warnings, and errors for better debugging and monitoring.",
+            "**Input Validation:** (Inferred future need) As this application will likely process user input, robust input validation will be crucial to prevent errors and security vulnerabilities.",
+            "**Documentation/Comments:** Add comments to explain the purpose of the 'questions' dictionary, the expected data types for the model, and any non-obvious logic."
+          ],
+          "overall_assessment": "This code snippet provides a basic, functional starting point for a Flask web application that integrates a machine learning model for panic disorder classification. It demonstrates fundamental Python and Flask skills. However, it requires significant enhancements in terms of completeness, error handling, security, and robustness to be considered production-ready. It serves well as a proof-of-concept or an initial development phase."
+        }
+      },
+      {
+        "name": "Roman-urdu-Sentiment-Analyzer",
         "description": null,
         "languages": [
           "Jupyter Notebook",
@@ -706,146 +896,162 @@
         ],
         "stars": 0,
         "forks": 0,
-        "commit_count": 4,
-        "last_updated": "2025-09-24T20:04:43Z",
-        "readme_preview": "We've developed a groundbreaking model that can instantly determine if an image contains a hidden message. With 95% accuracy, our technology analyzes digital images to detect subtle steganographic traces that are invisible to the human eye.\nImagine being able to scan through thousands of images and identify which ones might be concealing secret information - that's exactly what our model does. Perfect for cybersecurity, digital forensics, and protecting sensitive information.\nIn just milliseconds, we can tell you: Is there a secret message hiding in this image? Yes or no.\n\nContributions in : https://github.com/aniruddhg43986683/Bitcamp_Steganalysis/tree/main\n",
+        "commit_count": 10,
+        "last_updated": "2020-07-02T12:18:44Z",
+        "readme_preview": "# Roman-urdu-Sentiment-Analyzer\n\n### About the project\nUnderstanding an overview of wider public opinion behind certain topics is essential despite languages in order to measure the rate of increase in product management. But finding an emotion of a comment based on a certain language has always been a challenge. This Web application focuses on finding emotions in a user defined Urdu comment and provides the result instantaenously.\n \n### Development plan\n I used Support Vector Classifier to accomplish the classification of different emotions by training the data that was taken from https://archive.ics.uci.edu/ml/datasets/Roman+Urdu+Data+Set. Then I implemented Flask which is a microweb framework that intergates web app with python code. This goes along with stylesheets, html code and js files that were downloaded from https://materializecss.com/getting-started.html. There is also an Ipython notebook that speaks more about an in-depth construction and visualizaion of the model.  \n \n### ",
         "topics": [],
         "has_live_demo": false,
         "homepage": null,
         "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "Food-Deserts-in-the-United-States",
-        "description": null,
-        "languages": [
-          "Jupyter Notebook"
-        ],
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 20,
-        "last_updated": "2025-03-27T22:46:55Z",
-        "readme_preview": "\ud83e\udd66 Food Desert Analysis Across the United States\n\nThis project explores the distribution, severity, and key socio-economic drivers of food deserts in the United States using the USDA's Food Research Atlas and Food Environment Atlas datasets. Through in-depth data analysis, visualization, and machine learning models, we identify high-risk regions and propose actionable solutions for improving food accessibility and reducing nutritional inequality.\n\n---\n\n\ud83d\udcc1 Project Structure\n\n- \ud83d\udcca Data Exploration & Visualization\n- \ud83e\udde0 Predictive Modeling (Classification & Regression)\n- \ud83e\uddea Statistical Testing (T-tests, Correlation Analysis)\n- \ud83d\udcc8 Policy Recommendations & Regional Insights\n\n---\n\n\ud83e\uddfe Datasets Used\n\n- Food Access Research Atlas (2019)  \n  Provided by the USDA. Includes tract-level information on low-income and low-access areas.\n\n- Food Environment Atlas  \n  County-level indicators of food choices, health outcomes, and community characteristics.\n\n---\n\n\ud83e\uddea Modeling\n\n- Classification Model:\n  - Type: Rand",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "greek-symbols",
-        "description": "Greek symbols plugin for IntelliJ IDEA",
-        "languages": [
-          "Scala"
-        ],
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 3,
-        "last_updated": "2026-02-23T05:19:12Z",
-        "readme_preview": "# greek-symbols\nGreek symbols plugin for IntelliJ IDEA\n\n | Abbr |Letter| Name    |\n |------|------|---------|\n |  aa  |  \u03b1   | Alpha   |\n |  bb  |  \u03b2   | Beta    |\n |  gg  |  \u03b3   | Gamma   |\n |  dd  |  \u03b4   | Delta   |\n |  ee  |  \u03b5   | Epsilon |\n |  zz  |  \u03b6   | Zeta    |\n |  eta |  \u03b7   | Eta     |\n |  tt  |  \u03b8   | Theta   |\n |  ii  |  \u03b9   | Iota    |\n |  kk  |  \u03ba   | Kappa   |\n |  ll  |  \u03bb   | Lambda  |\n |  mu  |  \u03bc   | Mu      |\n |  nu  |  \u03bd   | Nu      |\n |  xi  |  \u03be   | Xi      |\n |  oo  |  \u03bf   | Omicron |\n |  pi  |  \u03c0   | Pi      |\n |  rr  |  \u03c1   | Rho     |\n |  ss  |  \u03c3   | Sigma   |\n |  tau |  \u03c4   | Tau     |\n |  uu  |  \u03c5   | Upsilon |\n |  pp  |  \u03c6   | Phi     |\n |  xx  |  \u03c7   | Chi     |\n |  psi |  \u03c8   | Psi     |\n |  ww  |  \u03c9   | Omega   |\n",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": "",
-        "is_fork": true,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "IMFRA",
-        "description": "Research Analyst Recruitment Test",
-        "languages": [],
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 1,
-        "last_updated": "2026-02-23T09:56:35Z",
-        "readme_preview": "# IMFRA\nResearch Analyst Recruitment Test\n",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
-      },
-      {
-        "name": "InvestIQ",
-        "description": "A UI/UX-first educational web app that teaches beginners how real investing works \u2014 honestly, visually, and interactively.",
-        "languages": [
-          "HTML",
-          "CSS",
-          "JavaScript"
-        ],
-        "stars": 0,
-        "forks": 0,
-        "commit_count": 5,
-        "last_updated": "2025-11-16T16:46:44Z",
-        "readme_preview": "# \ud83d\udcca InvestIQ \u2013 Interactive Portfolio Sandbox for Beginner Investors  \n\n## \ud83c\udf1f Inspiration  \nMost beginner investors have **no idea** what cash, bonds, stocks, index funds, or crypto actually mean \u2014 or how risky they are during real crashes.  \nAlmost every financial tool assumes prior knowledge, which leaves beginners confused and overwhelmed.  \n\nWe wanted to fix that by building a **beginner-first**, **visual**, **game-like** investing education tool.  \nA tool where users *learn by doing*, not reading boring textbooks.  \n\nThus, **InvestIQ** was born.  \n\n---\n\n## \ud83e\udde9 What it does  \nInvestIQ is a **multi-page, interactive financial learning platform** that teaches beginners how investing works using:  \n- \ud83c\udfae **Drag-and-drop portfolio building**  \n- \ud83d\udcca **Live animated pie charts**  \n- \u26a0\ufe0f **Real-time risk calculation**  \n- \ud83e\udde0 **Beginner-friendly explanations**  \n- \ud83d\udcf0 **Real market event stories with external links**  \n- \ud83c\udf08 **Cyberpunk neon UI/UX and animations**  \n\n### \ud83d\udca1 Core Features  \n- \ud83e\uddf1 Drag mone",
-        "topics": [],
-        "has_live_demo": false,
-        "homepage": null,
-        "is_fork": false,
-        "code_samples": {},
-        "code_insights": {}
+        "code_samples": {
+          "app.py": "from flask import Flask,render_template, request\r\nimport pickle\r\nfrom sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer\r\nimport re\r\nfrom nltk.tokenize import word_tokenize\r\n\r\n\r\napp = Flask(__name__)\r\n\r\nmodel = pickle.load(open('model_pickle', 'rb'))\r\nvec = pickle.load(open('vector_pickle','rb'))\r\n\r\n@app.route('/')\r\ndef form():\r\n    return render_template('sentiment.html')\r\n\r\ndef text_process(text):\r\n  return \" \".join(re.sub(\"(@[A-Za-z0-9]+)|([^0-9A-Za-z \\t])\", \" \",str(text",
+          "sentiment_analysis.py": "import pandas as pd\r\n\r\nfrom sklearn import svm\r\nfrom nltk.tokenize import word_tokenize\r\nfrom sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer\r\nfrom sklearn.preprocessing import LabelEncoder\r\nfrom sklearn.model_selection import train_test_split\r\nimport re\r\nimport pickle \r\n#loading data\r\ndf = pd.read_csv(\"roman_urdu.csv\")\r\ndf.columns = ['comment','sentiment', 'nan']\r\n# dropping the columns and missing values \r\ndf.drop(columns = ['nan'], axis = 1, inplace=True)\r\ndf = df.drop"
+        },
+        "code_insights": {
+          "code_quality": {
+            "score": 5,
+            "rating": "Intermediate",
+            "summary": "The code is functional and achieves its stated purpose. However, there's a lack of robust error handling, extensive commenting, and clear separation of concerns in some areas. Variable naming is generally clear, but some functions could be more modular. The use of pickle for model and vector storage is a simplification that might not be ideal for production environments due to versioning and security concerns."
+          },
+          "technical_complexity": {
+            "score": 6,
+            "rating": "Intermediate",
+            "summary": "The project involves common machine learning workflows: data loading and cleaning, text preprocessing, feature extraction (CountVectorizer/TfidfTransformer), model training (SVM), and deployment via Flask. The complexity is moderate, with the core challenge being effective Roman Urdu text processing and sentiment classification. The integration of NLTK for tokenization and regex for cleaning adds a layer of complexity."
+          },
+          "architecture_patterns": [
+            "Model-View-Controller (implied for Flask app)",
+            "Data Preprocessing Pipeline"
+          ],
+          "skills_demonstrated": [
+            "Python",
+            "Flask",
+            "Scikit-learn",
+            "Pandas",
+            "NLTK",
+            "Pickle",
+            "Regular Expressions",
+            "Sentiment Analysis",
+            "Text Preprocessing"
+          ],
+          "best_practices_used": [
+            "Using Flask for web framework",
+            "Leveraging Scikit-learn for ML tasks",
+            "Employing Pandas for data manipulation",
+            "Applying NLTK for text processing",
+            "Using regex for text cleaning",
+            "Splitting training and serving logic (implicitly)",
+            "Basic data cleaning and preprocessing steps"
+          ],
+          "areas_for_improvement": [
+            "Add comprehensive error handling (e.g., for file loading, model prediction).",
+            "Implement more robust model and vector serialization (e.g., using joblib or saving to a more version-controlled format).",
+            "Consider a more structured approach to text preprocessing, potentially using a dedicated preprocessing module.",
+            "Improve modularity in `app.py` by moving prediction logic into a separate function or class.",
+            "Add unit tests for preprocessing functions and the prediction endpoint.",
+            "Expand the stopwords list or use a more sophisticated stopword removal technique.",
+            "Document the code with docstrings, explaining function purposes, arguments, and return values.",
+            "Refactor the `sentiment_analysis.py` script to be a reusable module rather than a standalone script with inline training.",
+            "Address the duplicated `text_process` and `stopwords` definitions in both files.",
+            "Consider alternative feature extraction methods beyond CountVectorizer and TfidfTransformer.",
+            "The `predict` route in `app.py` is incomplete, needs implementation.",
+            "The `i = df[df['sentiment'] == 'Neative'].index` line in `sentiment_analysis.py` has a typo ('Neative' should likely be 'Negative')."
+          ],
+          "overall_assessment": "This repository provides a functional prototype for a Roman Urdu sentiment analyzer. The core logic for text processing and sentiment classification is present, and the Flask application serves as a basic interface. However, the project shows signs of early development, with a need for more robust engineering practices, better code organization, and enhanced error handling to be production-ready. The duplication of preprocessing code and the incomplete `predict` route are key areas needing immediate attention.",
+          "notable_observations": [
+            "The project successfully tackles the challenge of sentiment analysis on Roman Urdu text, which is less common than standard Urdu or English.",
+            "The use of `pickle` for model serialization is a common, albeit potentially problematic, approach for quick prototyping.",
+            "The custom stopwords list is specific to Roman Urdu and demonstrates an understanding of the language's nuances.",
+            "The `sentiment_analysis.py` script contains a clear data loading, cleaning, and preprocessing pipeline.",
+            "There is a noticeable duplication of `text_process` function and `stopwords` list between `app.py` and `sentiment_analysis.py`, indicating a potential for refactoring.",
+            "The `predict` route in `app.py` is defined but not implemented."
+          ]
+        }
       }
     ]
   },
   "code_analysis": {
     "repos_analyzed": 5,
     "skills_from_code": [
-      "CSS framework integration (Bootstrap)",
-      "Basic SQL queries (INSERT, SELECT)",
-      "File Uploads (basic implementation)",
-      "HTML/CSS integration (implied)",
-      "Traditional Machine Learning (Scikit-learn, TF-IDF, Logistic Regression, model evaluation)",
-      "Session Management",
-      "JavaScript (jQuery) for DOM manipulation and UI enhancements",
-      "Handling HTTP POST requests and form data",
-      "PHP (procedural programming)",
-      "PDO for database interaction (MySQL/MariaDB)",
-      "Data Handling and Cleaning (Pandas for Excel/CSV, fillna, column operations)",
-      "Natural Language Processing (Text preprocessing, regex, TF-IDF, sentence embeddings, Transformer models)",
-      "Basic PHP syntax and control structures (if/else, isset)",
-      "SQL query writing (SELECT, UPDATE, Aggregate Functions like COUNT, SUM, CASE)",
-      "Integration of third-party jQuery plugins (meanmenu, tooltips, sticky, NiceScroll, jQuery Validate)",
-      "Form Handling and Validation (basic)",
-      "Strong Password Hashing and Verification (password_hash, password_verify)",
-      "Basic error handling with try-catch blocks",
-      "Deep Learning Fundamentals (PyTorch for model inference, Hugging Face Transformers for fine-tuning)",
-      "Basic database interaction (mysqli or PDO object usage, mysqli_real_escape_string)",
-      "Python Programming (scripting, data manipulation)",
-      "Software Engineering Fundamentals (basic error handling, modularity, file system operations)",
-      "Basic session management",
-      "Experimentation and Iterative Development (implied by multiple classification approaches)",
-      "Model Persistence and Loading (joblib)",
-      "HTML5 structure and meta-tags"
+      "Data Preprocessing",
+      "Streamlit (Web Application Framework)",
+      "Flask (for app.py)",
+      "TensorFlow (implied if used for training)",
+      "Python programming fundamentals (variables, dictionaries, file I/O).",
+      "Understanding of basic web application structure.",
+      "Pandas",
+      "Natural Language Processing (NLP)",
+      "Scikit-learn",
+      "IBM WatsonX AI (LLM Integration)",
+      "AWS S3",
+      "Pickle",
+      "Environment Variable Management",
+      "Deployment Concepts (model loading, device management)",
+      "Algorithm Implementation",
+      "Python",
+      "Text Preprocessing",
+      "Secrets Management (.streamlit/secrets.toml)",
+      "AWS Lambda",
+      "Machine learning model serialization/deserialization using `pickle`.",
+      "Python Programming",
+      "Basic Flask web framework usage (app initialization, importing modules).",
+      "Flask",
+      "Error Handling (conditional imports)",
+      "NLTK",
+      "API Integration",
+      "MongoDB (Database Integration)",
+      "Image Processing (PIL)",
+      "Machine Learning (Naive Bayes)",
+      "PyTorch",
+      "Streamlit (for ml-model.py)",
+      "Web Development (basic HTML/JS for app.py)",
+      "Sentiment Analysis",
+      "Torchvision",
+      "Regular Expressions"
     ],
     "architecture_patterns": [
-      "Monolithic (simple script-based)",
-      "Modular Design (separation of training and prediction scripts, helper functions)",
-      "Configuration Management (basic hardcoded paths and thresholds, improved in Classifier 3 with PROJECT_ROOT)",
-      "Machine Learning Pipeline (Data Loading -> Preprocessing -> Model Training/Loading -> Prediction)",
-      "Procedural (with page controller style)",
-      "Layered (implicit separation for config/database)",
-      "Data Access Layer (simple file I/O for CSV/Excel)"
+      "Serverless Computing",
+      "Model-View-Controller (MVC) - Streamlit's reactive nature and separation of concerns (UI, backend logic) loosely align with MVC principles.",
+      "Service-Oriented Architecture (SOA) - Interaction with external services like IBM WatsonX and MongoDB can be seen as adopting SOA principles.",
+      "Monolithic: The application appears to follow a single-service, single-file monolithic structure, at least in this initial view.",
+      "Client-Server (Web Application): Implies a standard web application architecture where a client interacts with the Flask server.",
+      "Event-Driven Architecture (AWS Lambda)",
+      "Model-View-Controller (implied)",
+      "API (for app.py)",
+      "Model-View-Controller (implied for Flask app)",
+      "Data Preprocessing Pipeline",
+      "Client-Server (for app.py)",
+      "Data Access Layer - Use of PyMongo to interact with MongoDB suggests a data access layer pattern."
     ],
     "best_practices": [
-      "Dataset Balancing (Classifier 3 training script explicitly balances classes for imbalanced datasets)",
-      "Use of 'mysqli_real_escape_string' (though not sufficient and only used in one file)",
-      "Basic Error Handling and Validation (os.path.exists, try-except for file I/O, column validation)",
-      "Modular Code Design (e.g., dedicated safe loading functions)",
-      "Basic access control (`if (!isset($_SESSION['admin_id']))`) for authenticated areas.",
-      "Use of prepared statements for sensitive database write operations (`UPDATE`, `INSERT`) to mitigate SQL injection.",
-      "Strong password hashing using `password_hash()` and `password_verify()` for admin authentication.",
-      "Clear Separation of Concerns (training vs. prediction scripts)",
-      "Client-side validation with jQuery Validate (though not fully leveraged in server-side handling)",
-      "Informative Logging (using [INFO], [ERROR], [WARN] prefixes)",
-      "Crucial `is_uploaded_file()` check to validate file uploads.",
-      "Use of 'header()' for redirection (in 'login.php' only)",
-      "Basic input trimming (`trim()`) for user-submitted data.",
-      "Responsive design considerations (viewport meta tag, Bootstrap, meanmenu plugin)",
-      "Session-based authentication for controlling admin access.",
-      "Model Persistence (saving/loading models with joblib)"
+      "Code Modularity: Separates concerns into different files (`medbird_chatbot.py`, `summary_generator.py`).",
+      "Clear separation of training and prediction logic",
+      "AWS SDK (`boto3`) for cloud interaction",
+      "Employing Pandas for data manipulation",
+      "Optional Dependency Handling: Gracefully handles cases where `ibm-watsonx-ai` or `pymongo` are not installed using `try-except` blocks.",
+      "Separation of model loading and application logic",
+      "Streamlit Page Configuration: Uses `st.set_page_config` for setting up the web page title, icon, and layout.",
+      "Leveraging Scikit-learn for ML tasks",
+      "Configuration Helpers: Provides utility functions (`_env_or_secret`) to manage configuration retrieval from environment variables or secrets.",
+      "Lowercasing text for case-insensitivity",
+      "Type hinting (in ml-model.py)",
+      "Log probabilities for numerical stability",
+      "Clear and descriptive variable names (`app`, `model`, `questions`).",
+      "Using a context manager (`with open(...) as f:`) for safe file handling, ensuring the file is properly closed.",
+      "Type Hinting: Uses type hints (`typing.Any`, `typing.Dict`, etc.) for better code readability and maintainability (observed in `summary_generator.py`).",
+      "Model evaluation mode (`model.eval()`)",
+      "Secrets Management: Encourages the use of `.streamlit/secrets.toml` for sensitive credentials.",
+      "Using `torch.no_grad()` during inference (implied by `model.eval()`)",
+      "Applying NLTK for text processing",
+      "Use of `defaultdict` for efficient counting",
+      "Using regex for text cleaning",
+      "Clear File Headers and Instructions: Each file starts with a clear header explaining its purpose, quick start instructions, and how to configure secrets.",
+      "Splitting training and serving logic (implicitly)",
+      "Basic smoothing (add-one smoothing implied in calculation)",
+      "Basic data cleaning and preprocessing steps",
+      "Using environment variables or config for paths (potential, but not fully implemented)",
+      "Caching model loading (in ml-model.py with `st.cache_resource`)",
+      "Predefined transforms for consistent preprocessing",
+      "Using Flask for web framework"
     ]
   },
   "portfolio": {
@@ -854,13 +1060,14 @@
     "structured": {}
   },
   "links": {
-    "github": "https://github.com/siddharth-spyder",
+    "github": "https://github.com/aniruddh996",
     "portfolio": null,
-    "linkedin": "https://www.linkedin.com/in/siddharth-saravanan/"
+    "linkedin": "LinkedIn"
   },
   "sources_used": {
     "resume": true,
     "github": true,
-    "portfolio": false
+    "portfolio": false,
+    "code_analysis": true
   }
 }
