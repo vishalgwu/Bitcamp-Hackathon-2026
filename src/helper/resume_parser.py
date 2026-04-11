@@ -413,3 +413,4 @@ def parse_resume(source, filename=None):
         return parse_resume_from_text(source)
     else:
         raise ValueError("source must be file bytes or text string")
+        
