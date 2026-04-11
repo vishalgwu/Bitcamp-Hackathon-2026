@@ -161,7 +161,10 @@ def print_summary(unified_profile, portfolio_url):
     port_skills = unified_profile['skills']['from_portfolio']
     print(f"  From portfolio : {', '.join(port_skills) if port_skills else 'None'}")
     code_skills = unified_profile['skills']['from_code']
-    print(f"  From code      : {', '.join(code_skills) if code_skills else 'None (no code analysis run)'}")
+    print(
+        f"  From code      : "
+        f"{', '.join(code_skills) if code_skills else 'None (no code analysis run)'}"
+    )
 
     # ── Experience ────────────────────────────────────────
     print("\n💼 EXPERIENCE")
@@ -487,7 +490,10 @@ def run_agent1():
         public_repos = _profile.get("public_repos", 0)
 
         if public_repos > 200:
-            print(f"\n  ⚠️  This account has {public_repos} repos — looks like an org not a person")
+            print(
+                f"\n  ⚠️  This account has {public_repos} repos "
+                f"— looks like an org not a person"
+            )
             confirm = input(
                 "  Are you sure this is the right GitHub URL? (y/n): "
             ).strip().lower()
@@ -502,18 +508,10 @@ def run_agent1():
             ).strip().lower()
             analyze_code = analyze != "n"
 
-            max_repos = 3
-            if analyze_code:
-                max_input = input(
-                    "  How many repos to analyze? (1-5) [3]: "
-                ).strip()
-                if max_input.isdigit():
-                    max_repos = max(1, min(5, int(max_input)))
-
             github_data = scrape_github(
                 github_url,
                 analyze_code=analyze_code,
-                max_repos_to_analyze=max_repos
+                max_repos_to_analyze=0  # 0 = analyze ALL non-fork repos
             )
     else:
         print("  ⚠️  No GitHub URL — skipping GitHub scraping")
