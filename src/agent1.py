@@ -2,7 +2,7 @@ import os
 import json
 import sys
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, simpledialog, messagebox
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -131,6 +131,85 @@ def merge_profiles(resume_data, github_data, portfolio_data):
             ).get("repos_analyzed", 0) > 0
         }
     }
+
+# ─── Link Prompt Helper ───────────────────────────────────
+
+def prompt_for_link(link_type, description):
+    """
+    Shows a GUI popup asking user to paste a link or skip.
+    Only called when a link was NOT found automatically.
+    Returns the pasted URL or None if skipped.
+    """
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+
+    # Ask if they want to provide the link
+    want_to_provide = messagebox.askyesno(
+        title=f"{link_type} URL Not Found",
+        message=(
+            f"{description}\n\n"
+            f"Would you like to provide your {link_type} URL?"
+        )
+    )
+
+    if not want_to_provide:
+        root.destroy()
+        print(f"  ⏭️  User skipped {link_type} URL")
+        return None
+
+    # Ask for the URL
+    url = simpledialog.askstring(
+        title=f"Enter {link_type} URL",
+        prompt=f"Paste your {link_type} URL below:",
+        parent=root
+    )
+
+    root.destroy()
+
+    if url and url.strip():
+        url = url.strip()
+        print(f"  ✅ User provided {link_type} URL: {url}")
+        return url
+
+    print(f"  ⏭️  User did not enter a {link_type} URL — skipping")
+    return None
+
+# ─── GitHub Scraper Helper ────────────────────────────────
+
+def scrape_github_profile(github_url):
+    """
+    Validates the URL, checks for org accounts,
+    then runs the full GitHub scrape + code analysis.
+    Returns github_data dict or empty dict if skipped.
+    """
+    if not github_url:
+        return {}
+
+    username     = github_url.rstrip("/").split("/")[-1]
+    _profile     = get_profile(username)
+    public_repos = _profile.get("public_repos", 0)
+
+    # Safety check for org accounts
+    if public_repos > 200:
+        print(
+            f"\n  ⚠️  This account has {public_repos} repos "
+            f"— looks like an org not a person"
+        )
+        confirm = input(
+            "  Are you sure this is the right GitHub URL? (y/n): "
+        ).strip().lower()
+        if confirm != "y":
+            print("  ⏭️  Skipping GitHub scraping.")
+            return {}
+
+    print(f"  🚀 Starting GitHub scraping + code analysis...")
+
+    return scrape_github(
+        github_url,
+        analyze_code=True,
+        max_repos_to_analyze=0  # 0 = analyze ALL non-fork repos
+    )
 
 # ─── Print Summary ────────────────────────────────────────
 
@@ -273,7 +352,6 @@ def print_summary(unified_profile, portfolio_url):
     print("\n🔍 CODE ANALYSIS")
     if repos_analyzed == 0:
         print("  ⚠️  No code analysis was run")
-        print("  (Run agent1.py again and choose 'y' for code analysis)")
     else:
         print(f"  Repos analyzed       : {repos_analyzed}")
 
@@ -463,60 +541,35 @@ def run_agent1():
     github_url   = query_github_url(collection, resume_data)
     linkedin_url = query_linkedin_url(collection, resume_data)
 
-    # GitHub URL — auto detected or manual input
-    if github_url:
-        print(f"\n  ✅ GitHub URL detected: {github_url}")
-        github_input = input(
-            "  Press Enter to use this or paste the correct one: "
-        ).strip()
-    else:
-        print("\n  ⚠️  No GitHub URL found automatically")
-        print("  (This happens when resume is pasted as text or links are hyperlinked)")
-        github_input = input(
-            "  Paste GitHub URL (e.g. https://github.com/username) or Enter to skip: "
-        ).strip()
-
-    if github_input:
-        github_url = github_input
-
-    # ── Step 3: Scrape GitHub + Analyze Code ─────────────
+    # ── Step 3: GitHub — Auto or Prompt ───────────────────
     print("\n🐙 STEP 3: GitHub Sub-Agent")
     github_data = {}
 
     if github_url:
-        # Safety check for large org accounts
-        username     = github_url.rstrip("/").split("/")[-1]
-        _profile     = get_profile(username)
-        public_repos = _profile.get("public_repos", 0)
+        # ✅ Found — proceed immediately, no asking
+        print(f"  ✅ GitHub URL found: {github_url}")
+        github_data = scrape_github_profile(github_url)
 
-        if public_repos > 200:
-            print(
-                f"\n  ⚠️  This account has {public_repos} repos "
-                f"— looks like an org not a person"
+    else:
+        # ❌ Not found — pop up and ask user to paste or skip
+        print("  ⚠️  No GitHub URL found automatically")
+        print("  (Hyperlink text was found but not the actual URL)")
+
+        github_url = prompt_for_link(
+            link_type="GitHub",
+            description=(
+                "No GitHub URL was found in your resume.\n"
+                "This may be because your GitHub link is a hyperlink\n"
+                "with display text only (e.g. 'GitHub' instead of the URL)."
             )
-            confirm = input(
-                "  Are you sure this is the right GitHub URL? (y/n): "
-            ).strip().lower()
-            if confirm != "y":
-                print("  Skipping GitHub scraping.")
-                github_url  = None
-                github_data = {}
+        )
 
         if github_url:
-            analyze = input(
-                "\n  Run code analysis on repos? (y/n) [y]: "
-            ).strip().lower()
-            analyze_code = analyze != "n"
+            github_data = scrape_github_profile(github_url)
+        else:
+            print("  ⏭️  Skipping GitHub scraping — no URL provided")
 
-            github_data = scrape_github(
-                github_url,
-                analyze_code=analyze_code,
-                max_repos_to_analyze=0  # 0 = analyze ALL non-fork repos
-            )
-    else:
-        print("  ⚠️  No GitHub URL — skipping GitHub scraping")
-
-    # ── Step 4: Find Portfolio ────────────────────────────
+    # ── Step 4: Find Portfolio — Auto or Prompt ───────────
     print("\n🔍 STEP 4: Finding Portfolio URL...")
     portfolio_url = query_portfolio_url(collection, resume_data)
 
@@ -524,29 +577,34 @@ def run_agent1():
         print("  Not found in resume — checking GitHub repos...")
         portfolio_url = extract_portfolio_from_github(github_data)
 
-    # Portfolio URL — auto detected or manual input
     if portfolio_url:
-        print(f"\n  ✅ Portfolio URL detected: {portfolio_url}")
-        portfolio_input = input(
-            "  Press Enter to use this or paste the correct one: "
-        ).strip()
-    else:
-        print("\n  ⚠️  No Portfolio URL found automatically")
-        print("  (This happens when resume is pasted as text or links are hyperlinked)")
-        portfolio_input = input(
-            "  Paste Portfolio URL or Enter to skip: "
-        ).strip()
+        # ✅ Found — proceed immediately, no asking
+        print(f"  ✅ Portfolio URL found: {portfolio_url}")
 
-    if portfolio_input:
-        portfolio_url = portfolio_input
+    else:
+        # ❌ Not found — pop up and ask user to paste or skip
+        print("  ⚠️  No Portfolio URL found automatically")
+
+        portfolio_url = prompt_for_link(
+            link_type="Portfolio",
+            description=(
+                "No portfolio/personal website URL was found in your resume.\n"
+                "This may be because your portfolio link is a hyperlink\n"
+                "with display text only (e.g. 'Portfolio' instead of the URL)."
+            )
+        )
+
+        if not portfolio_url:
+            print("  ⏭️  Skipping portfolio scraping — no URL provided")
 
     # ── Step 5: Scrape Portfolio ──────────────────────────
     print("\n🌐 STEP 5: Portfolio Sub-Agent")
     portfolio_data = {}
     if portfolio_url:
+        print(f"  🚀 Starting portfolio scraping...")
         portfolio_data = scrape_portfolio(portfolio_url)
     else:
-        print("  ⚠️  No portfolio URL found anywhere — skipping")
+        print("  ⏭️  No portfolio URL — skipping")
 
     # ── Step 6: Merge All Sources ─────────────────────────
     print("\n🔀 STEP 6: Merging all sources...")
