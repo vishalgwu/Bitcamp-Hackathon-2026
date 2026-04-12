@@ -1,0 +1,9 @@
+pdfplumber
+python-docx
+PyMuPDF
+requests
+beautifulsoup4
+langchain
+langgraph
+python-dotenv
+openai
