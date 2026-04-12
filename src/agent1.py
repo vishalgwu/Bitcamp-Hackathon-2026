@@ -20,6 +20,7 @@ from helper.rag_extractor     import (
     query_portfolio_url,
     extract_portfolio_from_github
 )
+from helper.db import get_db, create_collections, save_student_profile
 
 # ─── Profile Merger ───────────────────────────────────────
 
@@ -135,16 +136,10 @@ def merge_profiles(resume_data, github_data, portfolio_data):
 # ─── Link Prompt Helper ───────────────────────────────────
 
 def prompt_for_link(link_type, description):
-    """
-    Shows a GUI popup asking user to paste a link or skip.
-    Only called when a link was NOT found automatically.
-    Returns the pasted URL or None if skipped.
-    """
     root = tk.Tk()
     root.withdraw()
     root.attributes("-topmost", True)
 
-    # Ask if they want to provide the link
     want_to_provide = messagebox.askyesno(
         title=f"{link_type} URL Not Found",
         message=(
@@ -158,7 +153,6 @@ def prompt_for_link(link_type, description):
         print(f"  ⏭️  User skipped {link_type} URL")
         return None
 
-    # Ask for the URL
     url = simpledialog.askstring(
         title=f"Enter {link_type} URL",
         prompt=f"Paste your {link_type} URL below:",
@@ -178,11 +172,6 @@ def prompt_for_link(link_type, description):
 # ─── GitHub Scraper Helper ────────────────────────────────
 
 def scrape_github_profile(github_url):
-    """
-    Validates the URL, checks for org accounts,
-    then runs the full GitHub scrape + code analysis.
-    Returns github_data dict or empty dict if skipped.
-    """
     if not github_url:
         return {}
 
@@ -190,7 +179,6 @@ def scrape_github_profile(github_url):
     _profile     = get_profile(username)
     public_repos = _profile.get("public_repos", 0)
 
-    # Safety check for org accounts
     if public_repos > 200:
         print(
             f"\n  ⚠️  This account has {public_repos} repos "
@@ -208,7 +196,7 @@ def scrape_github_profile(github_url):
     return scrape_github(
         github_url,
         analyze_code=True,
-        max_repos_to_analyze=0  # 0 = analyze ALL non-fork repos
+        max_repos_to_analyze=0
     )
 
 # ─── Print Summary ────────────────────────────────────────
@@ -219,271 +207,77 @@ def print_summary(unified_profile, portfolio_url):
     print("              AGENT 1 COMPLETE ✅")
     print("=" * 55)
 
-    # ── Candidate ─────────────────────────────────────────
     print("\n👤 CANDIDATE")
     print(f"  Name     : {unified_profile['candidate']['name']}")
     print(f"  Email    : {unified_profile['candidate']['email']}")
     print(f"  Phone    : {unified_profile['candidate']['phone']}")
     print(f"  Location : {unified_profile['candidate']['location']}")
-    print(f"  Summary  :")
-    summary = unified_profile['candidate'].get('summary', 'N/A')
-    for line in summary.split(". "):
-        line = line.strip()
-        if line:
-            print(f"    {line}.")
 
-    # ── Skills ────────────────────────────────────────────
     print("\n🛠️  SKILLS")
     print(f"  Total unique   : {len(unified_profile['skills']['all'])}")
-    print(f"  From resume    : {', '.join(unified_profile['skills']['from_resume'])}")
-    print(f"  From GitHub    : {', '.join(unified_profile['skills']['from_github'])}")
-    port_skills = unified_profile['skills']['from_portfolio']
-    print(f"  From portfolio : {', '.join(port_skills) if port_skills else 'None'}")
-    code_skills = unified_profile['skills']['from_code']
-    print(
-        f"  From code      : "
-        f"{', '.join(code_skills) if code_skills else 'None (no code analysis run)'}"
-    )
+    print(f"  From resume    : {len(unified_profile['skills']['from_resume'])} skills")
+    print(f"  From GitHub    : {len(unified_profile['skills']['from_github'])} languages")
+    print(f"  From portfolio : {len(unified_profile['skills']['from_portfolio'])} skills")
+    print(f"  From code      : {len(unified_profile['skills']['from_code'])} skills")
 
-    # ── Experience ────────────────────────────────────────
     print("\n💼 EXPERIENCE")
     for exp in unified_profile.get("experience", []):
-        print(f"  ┌─────────────────────────────────────────────────")
-        print(f"  │ Role        : {exp.get('role')}")
-        print(f"  │ Company     : {exp.get('company')}")
-        print(f"  │ Duration    : {exp.get('duration')}")
-        print(f"  │ Location    : {exp.get('location', 'N/A')}")
-        print(f"  │ Description :")
-        desc = exp.get('description', 'N/A')
-        for line in desc.split("\n"):
-            line = line.strip()
-            if line:
-                print(f"  │   {line}")
-        print(f"  └─────────────────────────────────────────────────")
+        print(f"  • {exp.get('role')} @ {exp.get('company')} ({exp.get('duration')})")
 
-    # ── Education ─────────────────────────────────────────
     print("\n🎓 EDUCATION")
     for edu in unified_profile.get("education", []):
-        print(f"  ┌─────────────────────────────────────────────────")
-        print(f"  │ Degree      : {edu.get('degree')}")
-        print(f"  │ Field       : {edu.get('field')}")
-        print(f"  │ Institution : {edu.get('institution')}")
-        print(f"  │ Year        : {edu.get('year')}")
-        print(f"  └─────────────────────────────────────────────────")
+        print(f"  • {edu.get('degree')} in {edu.get('field')} — {edu.get('institution')} ({edu.get('year')})")
 
-    # ── Certifications ────────────────────────────────────
     print("\n📜 CERTIFICATIONS")
-    certs = unified_profile.get("certifications", [])
-    if certs:
-        for cert in certs:
-            print(f"  • {cert}")
-    else:
-        print("  None")
+    for cert in unified_profile.get("certifications", []):
+        print(f"  • {cert}")
 
-    # ── Projects from Resume ──────────────────────────────
     print("\n📁 PROJECTS FROM RESUME")
     for proj in unified_profile["projects"].get("from_resume", []):
-        techs = ", ".join(proj.get("technologies", [])) or "N/A"
-        print(f"  ┌─────────────────────────────────────────────────")
-        print(f"  │ Name         : {proj.get('name')}")
-        print(f"  │ Technologies : {techs}")
-        print(f"  │ Description  :")
-        desc = proj.get("description", "N/A")
-        for line in desc.split("\n"):
-            line = line.strip()
-            if line:
-                print(f"  │   {line}")
-        print(f"  └─────────────────────────────────────────────────")
+        print(f"  • {proj.get('name')}")
 
-    # ── GitHub Profile ────────────────────────────────────
     print("\n🐙 GITHUB PROFILE")
     print(f"  Username     : {unified_profile['github_profile'].get('username')}")
-    print(f"  Bio          : {unified_profile['github_profile'].get('bio') or 'N/A'}")
-    print(f"  Website      : {unified_profile['github_profile'].get('website') or 'N/A'}")
-    print(f"  Followers    : {unified_profile['github_profile'].get('followers')}")
-    print(f"  Following    : {unified_profile['github_profile'].get('following', 'N/A')}")
     print(f"  Public repos : {unified_profile['github_profile'].get('public_repos')}")
-    print(f"  Languages    : {', '.join(unified_profile['skills']['from_github'])}")
+    print(f"  Followers    : {unified_profile['github_profile'].get('followers')}")
 
-    # Top Repos
-    print("\n  📂 Top Repos:")
-    for repo in unified_profile["github_profile"].get("top_repos", [])[:5]:
-        langs  = ", ".join(repo.get("languages", [])) or "N/A"
-        desc   = repo.get("description") or "No description"
-        readme = (repo.get("readme_preview", "") or "")[:200]
-        print(f"  ┌─────────────────────────────────────────────────")
-        print(f"  │ Repo         : {repo['name']}")
-        print(f"  │ Languages    : {langs}")
-        print(f"  │ Commits      : {repo.get('commit_count', 0)}")
-        print(f"  │ Stars        : {repo.get('stars', 0)}")
-        print(f"  │ Forks        : {repo.get('forks', 0)}")
-        print(f"  │ Last Updated : {repo.get('last_updated', 'N/A')}")
-        print(f"  │ Has Demo     : {repo.get('has_live_demo', False)}")
-        print(f"  │ Is Fork      : {repo.get('is_fork', False)}")
-        print(f"  │ Description  : {desc}")
-        if readme:
-            print(f"  │ README Preview:")
-            for line in readme.split("\n"):
-                line = line.strip()
-                if line:
-                    print(f"  │   {line}")
-        print(f"  └─────────────────────────────────────────────────")
-
-    # All GitHub Repos
     all_github = unified_profile["projects"].get("from_github", [])
-    print(f"\n  📂 All GitHub Repos ({len(all_github)} total):")
+    print(f"\n  All GitHub Repos ({len(all_github)} total):")
     for repo in all_github:
-        langs = ", ".join(repo.get("technologies", [])) or "N/A"
-        desc  = repo.get("description") or "No description"
-        print(f"  • {repo['name']}")
-        print(f"    Languages    : {langs}")
-        print(f"    Commits      : {repo.get('commit_count', 0)}")
-        print(f"    Stars        : {repo.get('stars', 0)}")
-        print(f"    Forks        : {repo.get('forks', 0)}")
-        print(f"    Last Updated : {repo.get('last_updated', 'N/A')}")
-        print(f"    Description  : {desc}")
-        print(f"    Is Fork      : {repo.get('is_fork', False)}")
-        print(f"    Has Demo     : {repo.get('has_live_demo', False)}")
+        insights = repo.get("code_insights", {})
+        cq       = insights.get("code_quality", {})
+        rating   = cq.get("rating", "")
+        score    = cq.get("score", "")
+        insight_str = f" → {rating} ({score}/10)" if rating else ""
+        print(f"  • {repo['name']}{insight_str}")
 
-    # ── Code Analysis ─────────────────────────────────────
     code_analysis  = unified_profile.get("code_analysis", {})
     repos_analyzed = code_analysis.get("repos_analyzed", 0)
-
     print("\n🔍 CODE ANALYSIS")
     if repos_analyzed == 0:
         print("  ⚠️  No code analysis was run")
     else:
-        print(f"  Repos analyzed       : {repos_analyzed}")
+        print(f"  Repos analyzed : {repos_analyzed}")
 
-        skills_from_code = code_analysis.get("skills_from_code", [])
-        if skills_from_code:
-            print(f"  Skills from code     :")
-            for s in skills_from_code:
-                print(f"    • {s}")
-
-        patterns = code_analysis.get("architecture_patterns", [])
-        if patterns:
-            print(f"  Architecture patterns:")
-            for p in patterns:
-                print(f"    • {p}")
-
-        best_practices = code_analysis.get("best_practices", [])
-        if best_practices:
-            print(f"  Best practices       :")
-            for b in best_practices:
-                print(f"    • {b}")
-
-        # Per repo insights
-        print("\n  Per Repo Code Insights:")
-        for repo in unified_profile["projects"].get("from_github", []):
-            insights = repo.get("code_insights", {})
-            if not insights:
-                continue
-
-            cq = insights.get("code_quality", {})
-            tc = insights.get("technical_complexity", {})
-
-            print(f"  ┌─────────────────────────────────────────────────")
-            print(f"  │ Repo              : {repo['name']}")
-            print(f"  │ Code Quality      : {cq.get('rating', 'N/A')} ({cq.get('score', 'N/A')}/10)")
-            print(f"  │ Quality Summary   : {cq.get('summary', 'N/A')}")
-            print(f"  │ Complexity        : {tc.get('rating', 'N/A')} ({tc.get('score', 'N/A')}/10)")
-            print(f"  │ Complexity Summary: {tc.get('summary', 'N/A')}")
-            print(f"  │ Overall           : {insights.get('overall_assessment', 'N/A')}")
-
-            skills = insights.get("skills_demonstrated", [])
-            if skills:
-                print(f"  │ Skills shown      :")
-                for s in skills:
-                    print(f"  │   • {s}")
-
-            arch = insights.get("architecture_patterns", [])
-            if arch:
-                print(f"  │ Patterns          :")
-                for a in arch:
-                    print(f"  │   • {a}")
-
-            bp = insights.get("best_practices_used", [])
-            if bp:
-                print(f"  │ Best practices    :")
-                for b in bp:
-                    print(f"  │   • {b}")
-
-            improvements = insights.get("areas_for_improvement", [])
-            if improvements:
-                print(f"  │ Improvements      :")
-                for item in improvements:
-                    print(f"  │   • {item}")
-
-            observations = insights.get("notable_observations", [])
-            if observations:
-                print(f"  │ Observations      :")
-                for obs in observations:
-                    print(f"  │   • {obs}")
-
-            samples = repo.get("code_samples", {})
-            if samples:
-                print(f"  │ Code files analyzed:")
-                for path in samples.keys():
-                    print(f"  │   • {path}")
-
-            print(f"  └─────────────────────────────────────────────────")
-
-    # ── Portfolio ─────────────────────────────────────────
     print("\n🌐 PORTFOLIO")
     if unified_profile["portfolio"].get("url"):
         print(f"  URL : {unified_profile['portfolio']['url']}")
-        structured = unified_profile["portfolio"].get("structured", {})
-        if structured:
-            print(f"  Name   : {structured.get('name', 'N/A')}")
-            print(f"  Title  : {structured.get('title', 'N/A')}")
-            print(f"  About  : {structured.get('about', 'N/A')}")
-            port_skills = structured.get("skills", [])
-            if port_skills:
-                print(f"  Skills : {', '.join(port_skills)}")
-            port_projects = structured.get("projects", [])
-            if port_projects:
-                print(f"  Projects:")
-                for proj in port_projects:
-                    techs = ", ".join(proj.get("technologies", [])) or "N/A"
-                    print(f"    ┌──────────────────────────────────────")
-                    print(f"    │ Name : {proj.get('name', 'N/A')}")
-                    print(f"    │ Tech : {techs}")
-                    print(f"    │ Desc : {proj.get('description', 'N/A')}")
-                    print(f"    │ Link : {proj.get('link', 'N/A')}")
-                    print(f"    └──────────────────────────────────────")
-            port_exp = structured.get("experience", [])
-            if port_exp:
-                print(f"  Experience:")
-                for exp in port_exp:
-                    print(f"    • {exp}")
-            contact = structured.get("contact", {})
-            if contact:
-                print(f"  Contact:")
-                print(f"    Email    : {contact.get('email', 'N/A')}")
-                print(f"    LinkedIn : {contact.get('linkedin', 'N/A')}")
-                print(f"    GitHub   : {contact.get('github', 'N/A')}")
-        headings = unified_profile["portfolio"].get("headings", [])
-        if headings:
-            print(f"  Page Headings : {', '.join(headings[:10])}")
     else:
         print("  ❌ Not found")
 
-    # ── Sources Used ──────────────────────────────────────
     print("\n📊 SOURCES USED")
     for source, used in unified_profile["sources_used"].items():
         status = "✅" if used else "❌"
         print(f"  {status} {source.capitalize()}")
 
-    # ── Links ─────────────────────────────────────────────
     print("\n🔗 LINKS")
-    print(f"  Email     : {unified_profile['candidate'].get('email')    or 'Not found'}")
-    print(f"  GitHub    : {unified_profile['links'].get('github')       or 'Not found'}")
-    print(f"  Portfolio : {unified_profile['links'].get('portfolio')    or 'Not found'}")
-    print(f"  LinkedIn  : {unified_profile['links'].get('linkedin')     or 'Not found'}")
+    print(f"  GitHub    : {unified_profile['links'].get('github')    or 'Not found'}")
+    print(f"  Portfolio : {unified_profile['links'].get('portfolio') or 'Not found'}")
+    print(f"  LinkedIn  : {unified_profile['links'].get('linkedin')  or 'Not found'}")
 
     print("\n" + "=" * 55)
     print("  ✅ Saved → outputs/candidate_profile.json")
+    print("  ✅ Saved → MongoDB student_profiles")
     print("  ✅ Ready for Agent 2")
     print("=" * 55)
 
@@ -546,15 +340,13 @@ def run_agent1():
     github_data = {}
 
     if github_url:
-        # ✅ Found — proceed immediately, no asking
+        # ✅ Found — proceed immediately
         print(f"  ✅ GitHub URL found: {github_url}")
         github_data = scrape_github_profile(github_url)
 
     else:
-        # ❌ Not found — pop up and ask user to paste or skip
+        # ❌ Not found — ask user
         print("  ⚠️  No GitHub URL found automatically")
-        print("  (Hyperlink text was found but not the actual URL)")
-
         github_url = prompt_for_link(
             link_type="GitHub",
             description=(
@@ -578,19 +370,18 @@ def run_agent1():
         portfolio_url = extract_portfolio_from_github(github_data)
 
     if portfolio_url:
-        # ✅ Found — proceed immediately, no asking
+        # ✅ Found — proceed immediately
         print(f"  ✅ Portfolio URL found: {portfolio_url}")
 
     else:
-        # ❌ Not found — pop up and ask user to paste or skip
+        # ❌ Not found — ask user
         print("  ⚠️  No Portfolio URL found automatically")
-
         portfolio_url = prompt_for_link(
             link_type="Portfolio",
             description=(
                 "No portfolio/personal website URL was found in your resume.\n"
                 "This may be because your portfolio link is a hyperlink\n"
-                "with display text only (e.g. 'Portfolio' instead of the URL)."
+                "with display text only."
             )
         )
 
@@ -615,12 +406,27 @@ def run_agent1():
     )
     print("  ✅ Profile merged!")
 
-    # ── Step 7: Save Output ───────────────────────────────
+    # ── Step 7: Save to JSON + MongoDB ───────────────────
+    print("\n💾 STEP 7: Saving outputs...")
+
+    # Save JSON locally
     os.makedirs("outputs", exist_ok=True)
     with open("outputs/candidate_profile.json", "w") as f:
         json.dump(unified_profile, f, indent=2)
+    print("  ✅ Saved → outputs/candidate_profile.json")
 
-    # ── Step 8: Print Full Summary ────────────────────────
+    # Save to MongoDB
+    print("\n  📦 Saving to MongoDB...")
+    try:
+        db = get_db()
+        create_collections(db)
+        profile_id = save_student_profile(unified_profile)
+        print(f"  ✅ Saved to MongoDB → profile ID: {profile_id}")
+    except Exception as e:
+        print(f"  ⚠️  MongoDB save failed: {e}")
+        print(f"  ⚠️  Profile still saved locally as JSON")
+
+    # ── Step 8: Print Summary ─────────────────────────────
     print_summary(unified_profile, portfolio_url)
 
     return unified_profile
