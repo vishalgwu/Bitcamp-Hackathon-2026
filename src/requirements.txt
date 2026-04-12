@@ -10,6 +10,7 @@ annotated-types==0.7.0
 anyio==4.12.1
 anywidget==0.9.21
 apify_client==2.5.0
+bcrypt
 apify_shared==2.2.0
 arch==8.0.0
 attrs==25.4.0
