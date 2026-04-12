@@ -126,7 +126,7 @@ def evaluate(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
-                    temperature=0.1,
+                    temperature=0,
                 )
             )
 
@@ -138,7 +138,7 @@ def evaluate(
                 log(f"JSON truncated from {model_name}, attempting repair...")
                 result = json.loads(repair_json(raw))
 
-            log(f"Success with {model_name}")
+            log(f"Success with {model_name} — score: {result.get('match_score', '?')}")
             return result
 
         except json.JSONDecodeError as e:
@@ -200,8 +200,8 @@ def summarize_github(github_data: dict, job_role: str, job_description: str) -> 
         })
 
     prompt = f"""
-You are a technical hiring analyst. Given a candidate's GitHub data and a job description,
-produce a structured summary. Return ONLY valid JSON — no markdown, no extra text.
+You are a strict technical hiring analyst. Your job is to identify ONLY repos that directly demonstrate
+skills required for the specific job below. Be conservative — if in doubt, exclude the repo.
 
 Job Role: {job_role}
 Job Description (excerpt): {job_description[:800]}
@@ -220,15 +220,30 @@ Developer Assessment: {json.dumps(final_assessment)}
 All Repositories ({len(repos_context)} total):
 {json.dumps(repos_context, indent=2)[:3000]}
 
-Return this exact JSON:
+MATCHING RULES:
+1. Read the Job Description above carefully. Extract the CORE required skills and technologies from it.
+2. A repo QUALIFIES only if it contains DIRECT evidence of those core skills — actual code, not just
+   tangential or "could be related" connections.
+3. A repo does NOT qualify just because:
+   - It uses the same programming language as the JD
+   - It "demonstrates foundational skills" or "could be useful for" the role
+   - It is a general-purpose tool that happens to overlap loosely
+   - The description sounds adjacent but has no real technical overlap with the JD
+4. If the JD is for a backend role, only include repos with real backend/API/system work.
+   If ML/AI, only repos with actual models or pipelines. If frontend, real UI work. And so on.
+5. If no repos genuinely match the JD requirements, return matched_repos as an empty list.
+   Do NOT stretch to fill the list.
+6. Exclude repos with no code, forks with no original work, and placeholder/empty repos.
+
+Return ONLY valid JSON — no markdown, no extra text:
 {{
     "profile_summary": "2-3 sentences describing the developer's background and style based on their GitHub",
     "skills_narrative": "2-3 sentences summarizing their technical skills, languages, and what they build",
-    "assessment_narrative": "2 sentences about their developer level and strengths/weaknesses",
+    "assessment_narrative": "2 sentences about their developer level and fit for this specific role",
     "matched_repos": [
         {{
             "name": "",
-            "relevance_reason": "1 sentence why this repo is relevant to the JD",
+            "relevance_reason": "1 sentence citing SPECIFIC evidence in this repo that maps to the JD requirements",
             "languages": [],
             "stars": 0,
             "commits": 0,
@@ -237,13 +252,11 @@ Return this exact JSON:
         }}
     ],
     "unmatched_count": 0,
-    "match_note": "1 sentence about repos that did not match and why"
+    "match_note": "1 sentence honestly describing what was excluded and why"
 }}
 
-matched_repos: only include repos that are relevant to the job role and description.
-If a repo has no code or is a fork with no original work, exclude it.
 Sort matched_repos by relevance (most relevant first).
-unmatched_count: number of repos excluded because they were not relevant.
+unmatched_count: total repos NOT in matched_repos.
 """
 
     last_error = None
@@ -252,19 +265,24 @@ unmatched_count: number of repos excluded because they were not relevant.
             response = client.models.generate_content(
                 model=model_name,
                 contents=prompt,
-                config=types.GenerateContentConfig(temperature=0.1)
+                config=types.GenerateContentConfig(temperature=0)
             )
             raw = clean_json(response.text)
-            return json.loads(raw)
-        except json.JSONDecodeError:
+
+            # Strip any stray HTML tags Gemini may have included inside JSON strings
+            raw = re.sub(r'<[^>]+>', '', raw)
+
             try:
-                # attempt basic repair
-                fixed = re.sub(r",\s*([}\]])", r"\1", raw)
-                return json.loads(fixed)
-            except:
-                last_error = Exception("JSON parse failed")
-                time.sleep(3)
-                continue
+                return json.loads(raw)
+            except json.JSONDecodeError:
+                # Attempt basic bracket repair
+                fixed = re.sub(r',\s*([}\]])', r'\1', raw)
+                try:
+                    return json.loads(fixed)
+                except:
+                    last_error = Exception("JSON parse failed after repair")
+                    time.sleep(3)
+                    continue
         except Exception as e:
             err_str = str(e)
             if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:

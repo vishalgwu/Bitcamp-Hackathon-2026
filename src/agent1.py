@@ -71,19 +71,36 @@ class Agent1:
         return file_bytes.decode("utf-8", errors="replace")
 
     def _extract_hyperlinks(self, file_bytes, filename):
-        ext = os.path.splitext(filename)[1].lower()
+        ext   = os.path.splitext(filename)[1].lower()
         links = []
+
         if ext == ".pdf":
+            # ── Method 1: PyMuPDF (fitz) — most reliable for PDFs ────────────
             try:
-                import pdfplumber
-                with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-                    for page in pdf.pages:
-                        for annot in (page.annots or []):
-                            uri = annot.get("uri") or annot.get("A", {}).get("URI")
-                            if uri and isinstance(uri, str) and uri.startswith("http"):
-                                links.append(uri)
-            except:
+                import fitz
+                doc = fitz.open(stream=file_bytes, filetype="pdf")
+                for page in doc:
+                    for link in page.get_links():
+                        uri = link.get("uri", "")
+                        if uri and isinstance(uri, str) and uri.startswith("http"):
+                            links.append(uri)
+                doc.close()
+            except Exception:
                 pass
+
+            # ── Method 2: pdfplumber annotations fallback ─────────────────────
+            if not links:
+                try:
+                    import pdfplumber
+                    with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                        for page in pdf.pages:
+                            for annot in (page.annots or []):
+                                uri = annot.get("uri") or annot.get("A", {}).get("URI")
+                                if uri and isinstance(uri, str) and uri.startswith("http"):
+                                    links.append(uri)
+                except Exception:
+                    pass
+
         elif ext in [".docx", ".doc"]:
             try:
                 from docx import Document
@@ -93,9 +110,44 @@ class Agent1:
                         url = rel._target
                         if isinstance(url, str) and url.startswith("http"):
                             links.append(url)
-            except:
+            except Exception:
                 pass
-        return list(set(links))
+
+        # Deduplicate + extract ONLY github profile URLs (not repo URLs)
+        seen    = set()
+        cleaned = []
+        for url in links:
+            url = url.strip().rstrip("/")
+            if url not in seen:
+                seen.add(url)
+                cleaned.append(url)
+
+        return cleaned
+
+    def _extract_github_url(self, hyperlinks):
+        """
+        From a list of hyperlinks, find the GitHub PROFILE url.
+        Profile:  github.com/username         (1 path segment) ✅
+        Repo:     github.com/username/repo    (2 segments)     ❌ — extract username
+        """
+        for url in hyperlinks:
+            if "github.com" not in url:
+                continue
+            # Strip protocol + domain
+            path = url.lower()
+            for prefix in ["https://github.com/", "http://github.com/",
+                           "https://www.github.com/"]:
+                if path.startswith(prefix):
+                    path = url[len(prefix):]
+                    break
+            parts = [p for p in path.rstrip("/").split("/") if p]
+            if len(parts) == 1:
+                # Already a profile URL
+                return f"https://github.com/{parts[0]}"
+            elif len(parts) >= 2:
+                # Repo URL — extract just the username part
+                return f"https://github.com/{parts[0]}"
+        return ""
 
     def _parse_with_gemini(self, text, hyperlinks):
         links_str = "\n".join(hyperlinks) if hyperlinks else "None found"
@@ -120,7 +172,15 @@ Hyperlinks found in document:
 Resume text:
 {text[:6000]}
 """
-        return self._gemini_json(prompt)
+        result = self._gemini_json(prompt)
+
+        # Override github_url with the one extracted directly from hyperlinks
+        # — more reliable than Gemini's extraction from text
+        github_from_links = self._extract_github_url(hyperlinks)
+        if github_from_links:
+            result["github_url"] = github_from_links
+
+        return result
 
     def parse_resume(self, file_bytes, filename):
         print(f"\n📄 Parsing resume: {filename}")
@@ -180,16 +240,19 @@ Resume text:
         return 0
 
     def _fetch_repo_code(self, username, repo_name):
+        # Try multiple branches — repos may not use main/master
         tree = []
-        for branch in ["main", "master", "HEAD"]:
+        for branch in ["main", "master", "HEAD", "dev", "develop"]:
             try:
                 r = requests.get(
                     f"https://api.github.com/repos/{username}/{repo_name}/git/trees/{branch}?recursive=1",
-                    headers=self.gh_headers, timeout=10
+                    headers=self.gh_headers, timeout=15
                 )
                 if r.status_code == 200:
-                    tree = r.json().get("tree", [])
-                    break
+                    data = r.json()
+                    tree = data.get("tree", [])
+                    if tree:
+                        break
             except:
                 pass
 
@@ -210,6 +273,9 @@ Resume text:
 
         code_samples = {}
         for path in files:
+            content = ""
+
+            # Method 1 — GitHub Contents API (base64)
             try:
                 r = requests.get(
                     f"https://api.github.com/repos/{username}/{repo_name}/contents/{path}",
@@ -217,14 +283,36 @@ Resume text:
                 )
                 if r.status_code == 200:
                     data = r.json()
-                    if isinstance(data, dict) and data.get("encoding") == "base64":
-                        content = base64.b64decode(
-                            data["content"].replace("\n", "")
-                        ).decode("utf-8", errors="replace")
-                        if content.strip():
-                            code_samples[path] = content
+                    if isinstance(data, dict):
+                        if data.get("encoding") == "base64" and data.get("content"):
+                            content = base64.b64decode(
+                                data["content"].replace("\n", "")
+                            ).decode("utf-8", errors="replace")
+                        elif data.get("download_url"):
+                            # Some files return download_url instead of base64
+                            r2 = requests.get(data["download_url"], timeout=10)
+                            if r2.status_code == 200:
+                                content = r2.text
             except:
                 pass
+
+            # Method 2 — raw.githubusercontent.com fallback
+            if not content or not content.strip():
+                for branch in ["main", "master", "HEAD"]:
+                    try:
+                        r = requests.get(
+                            f"https://raw.githubusercontent.com/{username}/{repo_name}/{branch}/{path}",
+                            headers={"Authorization": f"token {GITHUB_TOKEN}"},
+                            timeout=10
+                        )
+                        if r.status_code == 200 and r.text.strip():
+                            content = r.text
+                            break
+                    except:
+                        pass
+
+            if content and content.strip():
+                code_samples[path] = content
 
         return repo_name, code_samples
 
@@ -349,7 +437,7 @@ Profile:
                 print(f"    ⚠️  No code files found")
                 continue
 
-            # Analyze with Gemini
+            # Analyze with Gemini code key
             insights = self._analyze_code(repo_name, code_samples)
 
             # Store results
@@ -360,7 +448,10 @@ Profile:
                     if insights:
                         repos_analyzed += 1
 
-            time.sleep(3)  # small delay between repos
+            # Delay between repos — shorter now since quota is handled inside _call_gemini
+            if i < len(non_forks) - 1:
+                delay = 5 if (i + 1) % 3 == 0 else 2
+                time.sleep(delay)
 
         # Aggregate
         all_languages, all_skills, all_patterns, all_practices = [], [], [], []
@@ -417,14 +508,19 @@ Profile:
 
     def _gemini_json(self, prompt):
         """Uses GEMINI_API_KEY — for resume parsing + portfolio + developer assessment"""
-        return self._call_gemini(self.gemini, prompt)
+        return self._call_gemini(self.gemini, prompt, fallback_client=self.code_gemini)
 
     def _code_gemini_json(self, prompt):
         """Uses GEMINI_CODE_KEY — for GitHub code analysis only"""
-        return self._call_gemini(self.code_gemini, prompt)
+        return self._call_gemini(self.code_gemini, prompt, fallback_client=self.gemini)
 
-    def _call_gemini(self, client, prompt):
-        """Shared Gemini caller — used by both _gemini_json and _code_gemini_json"""
+    def _call_gemini(self, client, prompt, fallback_client=None):
+        """
+        Shared Gemini caller.
+        On quota hit → waits briefly → tries next model on same client.
+        If ALL models on primary client exhausted → switches to fallback_client.
+        This means GEMINI_CODE_KEY and GEMINI_API_KEY back each other up.
+        """
         def repair_json(text):
             text = text.strip()
             last_valid = max(text.rfind(','), text.rfind('}'), text.rfind(']'))
@@ -436,10 +532,10 @@ Profile:
             text += '}' * open_braces
             return text
 
-        for model in self.MODELS:
-            for attempt in range(3):
+        def try_client(c, label):
+            for model in self.MODELS:
                 try:
-                    response = client.models.generate_content(
+                    response = c.models.generate_content(
                         model=model, contents=prompt
                     )
                     raw = response.text.strip()
@@ -447,18 +543,44 @@ Profile:
                     try:
                         return json.loads(raw)
                     except json.JSONDecodeError:
-                        print(f"  JSON truncated from {model}, attempting repair...")
-                        return json.loads(repair_json(raw))
-                except json.JSONDecodeError as e:
-                    print(f"  JSON parse error from {model} even after repair: {e}")
-                    break
+                        print(f"  [{label}] JSON truncated from {model}, repairing...")
+                        try:
+                            return json.loads(repair_json(raw))
+                        except:
+                            print(f"  [{label}] Repair failed for {model}, trying next...")
+                            continue
                 except Exception as e:
-                    if "429" in str(e):
-                        print(f"  {model} quota hit — waiting 30s...")
-                        time.sleep(30)
-                        continue
-                    print(f"  {model} failed: {e}")
-                    break
+                    err = str(e)
+                    if "429" in err or "RESOURCE_EXHAUSTED" in err:
+                        print(f"  [{label}] {model} quota hit — trying next model...")
+                        time.sleep(5)   # short wait then immediately next model
+                    elif "503" in err or "unavailable" in err.lower():
+                        print(f"  [{label}] {model} unavailable — trying next model...")
+                        time.sleep(3)
+                    else:
+                        print(f"  [{label}] {model} error: {err[:80]}")
+                    continue
+            return None
+
+        # Try primary client first
+        result = try_client(client, "primary")
+        if result is not None:
+            return result
+
+        # All models on primary exhausted — switch to fallback key
+        if fallback_client and fallback_client is not client:
+            print(f"  Primary key exhausted — switching to fallback key...")
+            result = try_client(fallback_client, "fallback")
+            if result is not None:
+                return result
+
+        # Both keys exhausted — wait longer then try primary once more
+        print(f"  Both keys exhausted — waiting 90s then retrying...")
+        time.sleep(90)
+        result = try_client(client, "retry")
+        if result is not None:
+            return result
+
         return {}
 
     # =========================================================================

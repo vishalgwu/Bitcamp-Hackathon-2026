@@ -20,11 +20,42 @@ st.set_page_config(page_title="hire.ai", layout="wide", initial_sidebar_state="c
 def get_db():
     uri = os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
     client = MongoClient(uri)
-    return client["hireai"]
+    return client["hiring_platform"]
 
 db = get_db()
-employers_col = db["employers"]
+employers_col  = db["employers"]
 candidates_col = db["candidates"]
+profiles_col   = db["candidate_profiles"]  # cache of agent1 results
+
+# ─────────────────────────────────────────
+# PROFILE CACHE HELPERS
+# ─────────────────────────────────────────
+def get_cached_profile(email: str):
+    """Look up a previously parsed candidate profile by email."""
+    if not email:
+        return None
+    doc = profiles_col.find_one({"email": email.lower().strip()})
+    if doc:
+        doc.pop("_id", None)
+        return doc
+    return None
+
+def save_profile_cache(agent1_result: dict):
+    """Save agent1 result to MongoDB keyed by candidate email."""
+    email = agent1_result.get("resume", {}).get("email", "")
+    if not email:
+        return
+    email = email.lower().strip()
+    profiles_col.update_one(
+        {"email": email},
+        {"$set": {
+            **agent1_result,
+            "email":      email,
+            "cached_at":  datetime.now(timezone.utc)
+        }},
+        upsert=True
+    )
+    print(f"  ✅ Profile cached for {email}")
 
 def check_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
@@ -79,53 +110,303 @@ def get_video_b64():
 # SHARED CSS
 # ─────────────────────────────────────────
 DARK_CSS = """<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg:        #050508;
+    --surface:   #0c0c12;
+    --surface2:  #111118;
+    --surface3:  #17171f;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.12);
+    --accent:    #e8c547;
+    --accent2:   #f5d76e;
+    --accentdim: rgba(232,197,71,0.12);
+    --accentglow:rgba(232,197,71,0.25);
+    --teal:      #3ecfb2;
+    --tealdim:   rgba(62,207,178,0.12);
+    --red:       #ff5f57;
+    --reddim:    rgba(255,95,87,0.12);
+    --white:     #f0f0f5;
+    --muted:     rgba(240,240,245,0.45);
+    --faint:     rgba(240,240,245,0.2);
+    --serif:     'DM Serif Display', Georgia, serif;
+    --sans:      'DM Sans', system-ui, sans-serif;
+    --mono:      'JetBrains Mono', monospace;
+}
+
 #MainMenu, header, footer { visibility: hidden; }
-.stApp { background: #080812 !important; }
-[data-testid="stAppViewContainer"] { background: #080812 !important; }
-[data-testid="stMain"] { background: transparent !important; }
-.block-container { padding: 2rem 3rem !important; max-width: 100% !important; }
-* { color: #e8e8f0; }
-hr { border-color: rgba(255,255,255,0.06) !important; margin: 0 0 2rem 0 !important; }
-.nav-logo { font-size: 26px; font-weight: 900; color: white; letter-spacing: -1px; font-family: 'Arial Black', sans-serif; line-height: 1; }
-.nav-logo span { color: #7c6fff; }
-.nav-tag { font-size: 11px; color: rgba(255,255,255,0.3); font-weight: 400; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
-.stTextInput input, .stTextArea textarea {
-    background: #13132a !important; border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 10px !important; color: #ffffff !important; font-size: 14px !important;
+
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {
+    background: var(--bg) !important;
+    font-family: var(--sans) !important;
 }
-.stTextInput input:focus, .stTextArea textarea:focus {
-    border: 1px solid #7c6fff !important; box-shadow: 0 0 0 3px rgba(124,111,255,0.15) !important;
+
+.block-container {
+    padding: 2.5rem 3.5rem !important;
+    max-width: 100% !important;
 }
-.stTextInput input::placeholder, .stTextArea textarea::placeholder { color: rgba(255,255,255,0.2) !important; }
+
+* { color: var(--white); font-family: var(--sans); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ── Divider ── */
+hr {
+    border: none !important;
+    border-top: 1px solid var(--border) !important;
+    margin: 0 0 2.5rem 0 !important;
+}
+
+/* ── Nav Logo ── */
+.nav-logo {
+    font-family: var(--serif) !important;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    font-style: italic;
+}
+.nav-logo span { color: var(--accent); font-style: normal; }
+.nav-tag {
+    font-family: var(--sans);
+    font-size: 10px;
+    color: var(--faint);
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* ── Section label ── */
+.label {
+    font-size: 10px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--muted) !important;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+    font-family: var(--sans);
+}
+
+/* ── Text inputs ── */
+.stTextInput input,
+.stTextArea textarea {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    color: var(--white) !important;
+    font-size: 14px !important;
+    font-family: var(--sans) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+    border: 1px solid var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accentdim) !important;
+    outline: none !important;
+}
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: var(--faint) !important;
+}
+
+/* ── Widget labels ── */
 label[data-testid="stWidgetLabel"] p {
-    color: rgba(255,255,255,0.5) !important; font-size: 12px !important;
-    font-weight: 500 !important; letter-spacing: 1px !important; text-transform: uppercase !important;
+    color: var(--muted) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    font-family: var(--sans) !important;
 }
-.stSelectbox > div > div { background: #13132a !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 10px !important; color: white !important; }
-[data-testid="stFileUploader"] { background: #13132a !important; border: 1px dashed rgba(255,255,255,0.1) !important; border-radius: 12px !important; padding: 1rem !important; }
+
+/* ── File uploader ── */
+[data-testid="stFileUploader"] {
+    background: var(--surface2) !important;
+    border: 1px dashed rgba(232,197,71,0.2) !important;
+    border-radius: 10px !important;
+    padding: 1.25rem !important;
+    transition: border-color 0.2s ease !important;
+}
+[data-testid="stFileUploader"]:hover {
+    border-color: rgba(232,197,71,0.45) !important;
+}
+
+/* ── Primary button ── */
 .stButton > button {
-    background: linear-gradient(135deg, #7c6fff 0%, #4f8fff 100%) !important;
-    color: white !important; border: none !important; border-radius: 10px !important;
-    font-weight: 700 !important; font-size: 14px !important; letter-spacing: 0.5px !important;
-    padding: 14px 28px !important; width: 100% !important; transition: all 0.2s ease !important;
-    box-shadow: 0 4px 20px rgba(124,111,255,0.3) !important;
+    background: var(--accent) !important;
+    color: #0a0a0a !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    padding: 14px 28px !important;
+    width: 100% !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 0 0 0 var(--accentglow) !important;
+    font-family: var(--sans) !important;
 }
-.stButton > button:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 30px rgba(124,111,255,0.5) !important; }
+.stButton > button:hover {
+    background: var(--accent2) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 24px var(--accentglow) !important;
+}
+.stButton > button:active {
+    transform: translateY(0) !important;
+}
+
+/* ── Ghost button ── */
 .ghost-btn > button {
-    background: transparent !important; border: 1px solid rgba(255,255,255,0.1) !important;
-    color: rgba(255,255,255,0.5) !important; width: auto !important; box-shadow: none !important; padding: 8px 18px !important;
+    background: transparent !important;
+    border: 1px solid var(--border2) !important;
+    color: var(--muted) !important;
+    width: auto !important;
+    box-shadow: none !important;
+    padding: 8px 18px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 500 !important;
+    border-radius: 7px !important;
 }
-.ghost-btn > button:hover { background: rgba(255,255,255,0.05) !important; transform: none !important; box-shadow: none !important; color: white !important; }
-.link-btn > button { background: transparent !important; border: 1px solid rgba(124,111,255,0.3) !important; color: #7c6fff !important; box-shadow: none !important; font-weight: 600 !important; }
-.link-btn > button:hover { background: rgba(124,111,255,0.08) !important; transform: none !important; box-shadow: none !important; }
-[data-testid="stTabs"] button { color: rgba(255,255,255,0.35) !important; font-size: 14px !important; font-weight: 600 !important; padding: 12px 24px !important; border-radius: 0 !important; border-bottom: 2px solid transparent !important; background: transparent !important; }
-[data-testid="stTabs"] button[aria-selected="true"] { color: white !important; border-bottom: 2px solid #7c6fff !important; }
-[data-testid="stTabsContent"] { padding-top: 2rem !important; }
-.label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.35) !important; font-weight: 600; margin-bottom: 8px; display: block; }
-.auth-card { background: #0e0e20; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 3rem 2.5rem; }
-.auth-title { font-size: 32px; font-weight: 900; color: white !important; font-family: 'Arial Black', sans-serif; letter-spacing: -1px; margin-bottom: 6px; }
-.auth-sub { font-size: 14px; color: rgba(255,255,255,0.35) !important; margin-bottom: 2.5rem; line-height: 1.5; }
-.divider-text { text-align: center; font-size: 12px; color: rgba(255,255,255,0.2) !important; margin: 1rem 0; }
+.ghost-btn > button:hover {
+    background: var(--surface3) !important;
+    color: var(--white) !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: var(--border2) !important;
+}
+
+/* ── Link button ── */
+.link-btn > button {
+    background: transparent !important;
+    border: 1px solid rgba(232,197,71,0.25) !important;
+    color: var(--accent) !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    border-radius: 7px !important;
+}
+.link-btn > button:hover {
+    background: var(--accentdim) !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: rgba(232,197,71,0.45) !important;
+}
+
+/* ── Tabs ── */
+[data-testid="stTabs"] button {
+    color: var(--faint) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 12px 28px !important;
+    border-radius: 0 !important;
+    border-bottom: 2px solid transparent !important;
+    background: transparent !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    font-family: var(--sans) !important;
+    transition: color 0.2s ease !important;
+}
+[data-testid="stTabs"] button[aria-selected="true"] {
+    color: var(--accent) !important;
+    border-bottom: 2px solid var(--accent) !important;
+}
+[data-testid="stTabs"] button:hover {
+    color: var(--white) !important;
+}
+[data-testid="stTabsContent"] { padding-top: 2.5rem !important; }
+
+/* ── Expander ── */
+[data-testid="stExpander"] {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    margin-bottom: 0.75rem !important;
+    overflow: hidden !important;
+}
+[data-testid="stExpander"] summary {
+    padding: 1rem 1.25rem !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--muted) !important;
+    letter-spacing: 0.5px !important;
+}
+[data-testid="stExpander"] summary:hover { color: var(--white) !important; }
+[data-testid="stExpander"] > div > div {
+    padding: 0 1.25rem 1.25rem !important;
+}
+
+/* ── Auth card ── */
+.auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+}
+.auth-title {
+    font-family: var(--serif) !important;
+    font-size: 34px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--white) !important;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    line-height: 1.1;
+}
+.auth-sub {
+    font-size: 14px;
+    color: var(--muted) !important;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    font-weight: 300;
+}
+.divider-text {
+    text-align: center;
+    font-size: 11px;
+    color: var(--faint) !important;
+    margin: 1.25rem 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ── Alerts / warnings ── */
+[data-testid="stAlert"] {
+    border-radius: 8px !important;
+    border-left: 3px solid var(--accent) !important;
+    background: var(--accentdim) !important;
+}
+
+/* ── Spinner ── */
+[data-testid="stSpinner"] { color: var(--accent) !important; }
+
+/* ── Selectbox ── */
+.stSelectbox > div > div {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    color: var(--white) !important;
+}
 </style>"""
 
 # ─────────────────────────────────────────
@@ -222,31 +503,32 @@ def render_agent2_results(result):
     col_ring, col_radar = st.columns([1, 2])
     with col_ring:
         st.markdown(f"""
-        <div style="background:#0e0e20;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:1rem;">Match Score</div>
+        <div style="background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,{score_color},transparent);opacity:0.5;"></div>
+            <div style="font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:1.25rem;font-weight:600;">Match Score</div>
             <svg width="160" height="160" viewBox="0 0 160 160">
-                <circle cx="80" cy="80" r="65" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
-                <circle cx="80" cy="80" r="65" fill="none" stroke="{score_color}" stroke-width="12"
+                <circle cx="80" cy="80" r="65" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+                <circle cx="80" cy="80" r="65" fill="none" stroke="{score_color}" stroke-width="10"
                     stroke-dasharray="{dash:.1f} {circ:.1f}"
                     stroke-dashoffset="{offset:.1f}"
                     stroke-linecap="round"
-                    style="filter:drop-shadow(0 0 8px {score_color});"/>
-                <text x="80" y="75" text-anchor="middle" fill="white" font-size="32" font-weight="900" font-family="Arial Black">{score}</text>
-                <text x="80" y="95" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="11" font-family="Arial">/100</text>
+                    style="filter:drop-shadow(0 0 10px {score_color});transition:stroke-dasharray 1s ease;"/>
+                <text x="80" y="72" text-anchor="middle" fill="white" font-size="36" font-weight="700" font-family="DM Sans,sans-serif">{score}</text>
+                <text x="80" y="92" text-anchor="middle" fill="rgba(240,240,245,0.35)" font-size="11" font-family="DM Sans,sans-serif">out of 100</text>
             </svg>
-            <div style="display:inline-block;padding:6px 16px;background:{verdict_color}22;border:1px solid {verdict_color};border-radius:20px;margin-top:1rem;">
-                <span style="color:{verdict_color};font-weight:700;font-size:10px;letter-spacing:2px;">{verdict_label}</span>
+            <div style="display:inline-block;padding:5px 16px;background:{verdict_color}18;border:1px solid {verdict_color}55;border-radius:6px;margin-top:1.25rem;">
+                <span style="color:{verdict_color};font-weight:700;font-size:10px;letter-spacing:2.5px;">{verdict_label}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
     with col_radar:
         st.markdown(f"""
-        <div style="background:#0e0e20;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:2rem;">
-            <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:1rem;">Skill Radar</div>
+        <div style="background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:2rem;">
+            <div style="font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:1.25rem;font-weight:600;">Skill Radar</div>
             <svg width="100%" viewBox="0 0 400 400" style="max-height:280px;">
                 {grid_rings}{axis_lines}
-                <polygon points="{radar_points.strip()}" fill="rgba(124,111,255,0.2)" stroke="#7c6fff" stroke-width="2"/>
+                <polygon points="{radar_points.strip()}" fill="rgba(232,197,71,0.1)" stroke="#e8c547" stroke-width="1.5"/>
                 {dot_circles}{radar_labels_html}
             </svg>
         </div>
@@ -254,43 +536,29 @@ def render_agent2_results(result):
 
     # ── Summary ──
     st.markdown(f"""
-    <div style="background:#0e0e20;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:1.5rem;margin-top:1rem;margin-bottom:1.5rem;">
-        <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:8px;">Match Summary</div>
-        <p style="color:rgba(255,255,255,0.7);font-size:14px;line-height:1.8;margin:0;">{summary}</p>
+    <div style="background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:1.75rem;margin-top:1rem;margin-bottom:1.5rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8c547,rgba(232,197,71,0.2));border-radius:2px 0 0 2px;"></div>
+        <div style="font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:10px;font-weight:600;">Match Summary</div>
+        <p style="color:rgba(240,240,245,0.75);font-size:14px;line-height:1.9;margin:0;font-weight:300;">{summary}</p>
     </div>
     """, unsafe_allow_html=True)
 
     # ── Bar chart ──
-    bar_rows = ""
-    for c in categories:
-        bc = "#22c55e" if c["score"]>=75 else "#f59e0b" if c["score"]>=45 else "#ef4444"
-        bar_rows += f"""
-        <div style="margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                <span style="font-size:12px;color:rgba(255,255,255,0.6);">{c['name']}</span>
-                <span style="font-size:12px;font-weight:700;color:{bc};">{c['score']}</span>
-            </div>
-            <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:6px;">
-                <div style="background:{bc};width:{c['score']}%;height:6px;border-radius:4px;box-shadow:0 0 8px {bc}55;"></div>
-            </div>
-        </div>"""
-
-   
     st.markdown("""
-    <div style="background:#0e0e20;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;">
-        <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:1.5rem;">Category Breakdown</div>
+    <div style="background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem;">
+        <div style="font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:1.5rem;font-weight:600;">Category Breakdown</div>
     """, unsafe_allow_html=True)
 
     for c in categories:
-        bc = "#22c55e" if c["score"] >= 75 else "#f59e0b" if c["score"] >= 45 else "#ef4444"
+        bc = "#3ecfb2" if c["score"] >= 75 else "#e8c547" if c["score"] >= 45 else "#ff5f57"
         st.markdown(f"""
-        <div style="margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                <span style="font-size:12px;color:rgba(255,255,255,0.6);">{c['name']}</span>
-                <span style="font-size:12px;font-weight:700;color:{bc};">{c['score']}</span>
+        <div style="margin-bottom:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:12px;color:rgba(240,240,245,0.55);font-weight:500;letter-spacing:0.5px;">{c['name']}</span>
+                <span style="font-size:13px;font-weight:700;color:{bc};font-variant-numeric:tabular-nums;">{c['score']}</span>
             </div>
-            <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:6px;">
-                <div style="background:{bc};width:{c['score']}%;height:6px;border-radius:4px;box-shadow:0 0 8px {bc}55;"></div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:3px;height:4px;">
+                <div style="background:{bc};width:{c['score']}%;height:4px;border-radius:3px;box-shadow:0 0 8px {bc}66;transition:width 0.8s ease;"></div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -299,39 +567,28 @@ def render_agent2_results(result):
 
     # ── Strengths & Gaps ──
     col1, col2 = st.columns(2)
-    strengths_html = "".join([f"""
-        <div style="background:#0a1a12;border:1px solid rgba(34,197,94,0.15);border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
-            <div style="font-size:11px;font-weight:700;color:#22c55e;margin-bottom:4px;">{s.get('area','')}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">{s.get('evidence','')}</div>
-            <div style="font-size:11px;color:rgba(34,197,94,0.6);font-style:italic;">{s.get('relevance_to_job','')}</div>
-        </div>""" for s in strengths])
-
-    gaps_html = "".join([f"""
-        <div style="background:#1a0a0a;border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
-            <div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:4px;">{g.get('area','')}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">{g.get('gap_detail','')}</div>
-            <div style="font-size:11px;color:rgba(239,68,68,0.6);font-style:italic;">{g.get('impact_on_match','')}</div>
-        </div>""" for g in gaps])
+    strengths_html = ""
+    gaps_html      = ""
 
     with col1:
-        st.markdown("<div style='font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:1rem;'>Strengths</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:1rem;font-weight:600;'>Strengths</div>", unsafe_allow_html=True)
         for s in strengths:
             st.markdown(f"""
-            <div style="background:#0a1a12;border:1px solid rgba(34,197,94,0.15);border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
-                <div style="font-size:11px;font-weight:700;color:#22c55e;margin-bottom:4px;">{s.get('area','')}</div>
-                <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">{s.get('evidence','')}</div>
-                <div style="font-size:11px;color:rgba(34,197,94,0.6);font-style:italic;">{s.get('relevance_to_job','')}</div>
+            <div style="background:#080f0a;border:1px solid rgba(62,207,178,0.15);border-radius:10px;padding:1rem;margin-bottom:0.6rem;border-left:3px solid rgba(62,207,178,0.4);">
+                <div style="font-size:11px;font-weight:700;color:#3ecfb2;margin-bottom:5px;letter-spacing:0.5px;">{s.get('area','')}</div>
+                <div style="font-size:12px;color:rgba(240,240,245,0.55);margin-bottom:4px;line-height:1.6;">{s.get('evidence','')}</div>
+                <div style="font-size:11px;color:rgba(62,207,178,0.5);font-style:italic;">{s.get('relevance_to_job','')}</div>
             </div>
             """, unsafe_allow_html=True)
 
     with col2:
-        st.markdown("<div style='font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:1rem;'>Gaps</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:1rem;font-weight:600;'>Gaps</div>", unsafe_allow_html=True)
         for g in gaps:
             st.markdown(f"""
-            <div style="background:#1a0a0a;border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
-                <div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:4px;">{g.get('area','')}</div>
-                <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">{g.get('gap_detail','')}</div>
-                <div style="font-size:11px;color:rgba(239,68,68,0.6);font-style:italic;">{g.get('impact_on_match','')}</div>
+            <div style="background:#0f0808;border:1px solid rgba(255,95,87,0.15);border-radius:10px;padding:1rem;margin-bottom:0.6rem;border-left:3px solid rgba(255,95,87,0.4);">
+                <div style="font-size:11px;font-weight:700;color:#ff5f57;margin-bottom:5px;letter-spacing:0.5px;">{g.get('area','')}</div>
+                <div style="font-size:12px;color:rgba(240,240,245,0.55);margin-bottom:4px;line-height:1.6;">{g.get('gap_detail','')}</div>
+                <div style="font-size:11px;color:rgba(255,95,87,0.5);font-style:italic;">{g.get('impact_on_match','')}</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -415,7 +672,7 @@ if st.session_state.view == 'home':
 
     st.markdown("""<style>
         #MainMenu, header, footer { visibility: hidden; }
-        .stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] { background: #080812 !important; }
+        .stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] { background: #050508 !important; }
         .block-container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
         [data-testid="stVerticalBlock"] { gap: 0 !important; }
         html, body { overflow: hidden !important; }
@@ -424,29 +681,44 @@ if st.session_state.view == 'home':
 
     video_b64 = get_video_b64()
 
-    components.html(f"""<!DOCTYPE html><html><head><style>
+    components.html(f"""<!DOCTYPE html><html><head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
-        html,body{{width:100%;height:100%;overflow:hidden;font-family:'Arial Black',sans-serif;background:#080812;}}
+        html,body{{width:100%;height:100%;overflow:hidden;background:#050508;}}
         .bg-video{{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;object-fit:cover;z-index:0;}}
-        .overlay{{position:absolute;inset:0;background:rgba(8,8,18,0.75);z-index:1;}}
+        .overlay{{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,8,0.6) 0%,rgba(5,5,8,0.85) 60%,rgba(5,5,8,0.98) 100%);z-index:1;}}
+        .grain{{position:absolute;inset:0;z-index:2;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:128px;}}
         .hero{{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;text-align:center;padding:0 20px;}}
-        .title{{font-size:clamp(52px,10vw,110px);font-weight:900;color:white;letter-spacing:-3px;line-height:1;margin-bottom:12px;opacity:0;animation:fadeUp 0.8s ease forwards;text-shadow:0 0 80px rgba(124,111,255,0.6);}}
-        .subtitle{{font-size:clamp(11px,1.5vw,16px);color:rgba(255,255,255,0.4);letter-spacing:6px;text-transform:uppercase;font-family:Arial,sans-serif;font-weight:400;margin-bottom:56px;opacity:0;animation:fadeUp 0.8s ease 0.2s forwards;}}
-        .btn-group{{display:flex;flex-direction:column;gap:12px;width:280px;opacity:0;animation:fadeUp 0.8s ease 0.4s forwards;}}
-        .btn{{display:block;padding:15px 32px;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);color:white;text-decoration:none;text-align:center;transition:all 0.25s ease;}}
-        .btn:hover{{background:rgba(124,111,255,0.2);border-color:rgba(124,111,255,0.6);transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,111,255,0.25);color:white;}}
-        @keyframes fadeUp{{from{{opacity:0;transform:translateY(20px)}}to{{opacity:1;transform:translateY(0)}}}}
+        .tag{{font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(232,197,71,0.7);letter-spacing:5px;text-transform:uppercase;font-weight:500;margin-bottom:28px;opacity:0;animation:fadeUp 0.6s ease 0.1s forwards;}}
+        .title{{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(64px,11vw,128px);font-weight:400;font-style:italic;color:#f0f0f5;letter-spacing:-2px;line-height:0.95;margin-bottom:24px;opacity:0;animation:fadeUp 0.7s ease 0.2s forwards;}}
+        .title em{{color:#e8c547;font-style:normal;}}
+        .subtitle{{font-family:'DM Sans',sans-serif;font-size:clamp(13px,1.4vw,16px);color:rgba(240,240,245,0.4);letter-spacing:0.5px;font-weight:300;margin-bottom:60px;opacity:0;animation:fadeUp 0.7s ease 0.35s forwards;max-width:480px;line-height:1.7;}}
+        .btn-group{{display:flex;flex-direction:column;gap:10px;width:300px;opacity:0;animation:fadeUp 0.7s ease 0.5s forwards;}}
+        .btn{{display:block;padding:16px 32px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:rgba(240,240,245,0.8);text-decoration:none;text-align:center;transition:all 0.25s ease;}}
+        .btn:hover{{color:#0a0a0a;background:#e8c547;border-color:#e8c547;transform:translateY(-2px);box-shadow:0 16px 40px rgba(232,197,71,0.25);}}
+        .btn.primary{{background:rgba(232,197,71,0.1);border-color:rgba(232,197,71,0.3);color:#e8c547;}}
+        .btn.primary:hover{{background:#e8c547;color:#0a0a0a;border-color:#e8c547;}}
+        .corner{{position:absolute;width:60px;height:60px;z-index:5;opacity:0.3;}}
+        .corner-tl{{top:28px;left:28px;border-top:1px solid #e8c547;border-left:1px solid #e8c547;}}
+        .corner-br{{bottom:28px;right:28px;border-bottom:1px solid #e8c547;border-right:1px solid #e8c547;}}
+        @keyframes fadeUp{{from{{opacity:0;transform:translateY(24px)}}to{{opacity:1;transform:translateY(0)}}}}
     </style></head><body>
         <video class="bg-video" autoplay loop muted playsinline>
             <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
         </video>
         <div class="overlay"></div>
+        <div class="grain"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-br"></div>
         <div class="hero">
-            <h1 class="title">hire.ai</h1>
-            <p class="subtitle">Beyond the Resume. The full picture.</p>
+            <p class="tag">AI-Powered Hiring Intelligence</p>
+            <h1 class="title">hire<em>.</em>ai</h1>
+            <p class="subtitle">Beyond the resume. Deep candidate intelligence from GitHub, skills, and live interviews — all in one pipeline.</p>
             <div class="btn-group">
-                <a class="btn" href="?view=employer_auth">🚀 Enter as Employer</a>
-                <a class="btn" href="?view=candidate_auth">👤 Enter as Candidate</a>
+                <a class="btn primary" href="?view=employer_auth">Enter as Employer</a>
+                <a class="btn" href="?view=candidate_auth">Enter as Candidate</a>
             </div>
         </div>
     </body></html>""", height=800, scrolling=False)
@@ -469,8 +741,8 @@ elif st.session_state.view == 'employer_auth':
     _, col, _ = st.columns([1, 1, 1])
     with col:
         st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
-        st.markdown("<p class='auth-title'>Sign in</p>", unsafe_allow_html=True)
-        st.markdown("<p class='auth-sub'>Access your employer dashboard to analyze candidates and score interviews.</p>", unsafe_allow_html=True)
+        st.markdown("<p class='auth-title'>Welcome back</p>", unsafe_allow_html=True)
+        st.markdown("<p class='auth-sub'>Sign in to your employer dashboard to analyze candidates, score interviews, and make better hiring decisions.</p>", unsafe_allow_html=True)
         email = st.text_input("Email", placeholder="you@company.com", key="emp_email")
         password = st.text_input("Password", placeholder="••••••••", type="password", key="emp_pass")
         st.markdown("<br>", unsafe_allow_html=True)
@@ -586,6 +858,7 @@ elif st.session_state.view == 'employer':
             st.session_state.agent2_result = None
             st.session_state.interview_results = None
             st.session_state.pop("github_summary", None)
+            st.session_state.pop("profile_from_cache", None)
             st.session_state.view = 'home'
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
@@ -613,20 +886,74 @@ elif st.session_state.view == 'employer':
             elif not job_role or not job_description:
                 st.warning("Please enter the job role and description.")
             else:
-                with st.spinner("Parsing resume and GitHub profile..."):
-                    agent1_result = Agent1().run(resume_file.read(), resume_file.name)
-                    st.session_state.agent1_result = agent1_result
-                    st.session_state.agent2_result = None
-                    st.session_state.pop("github_summary", None)
+                st.session_state['saved_job_role']        = job_role
+                st.session_state['saved_job_description'] = job_description
+                st.session_state.agent2_result            = None
+                st.session_state.pop("github_summary", None)
+                st.session_state['profile_from_cache']    = False
 
-        # GitHub prompt if not found
-        if st.session_state.agent1_result:
-            github_found = st.session_state.agent1_result.get("resume", {}).get("github_url", "")
-            github_data  = st.session_state.agent1_result.get("github", {})
+                file_bytes = resume_file.read()
 
-            if not github_found or not github_data:
+                # ── Step 1: Extract email from raw text — no Gemini needed ────
+                with st.spinner("Reading resume..."):
+                    a1       = Agent1()
+                    raw_text = a1._extract_text(file_bytes, resume_file.name)
+                    import re as _re
+                    email_match     = _re.search(r'[\w.\-+]+@[\w\-]+\.[a-zA-Z]{2,}', raw_text)
+                    candidate_email = email_match.group(0).lower().strip() if email_match else ""
+
+                # ── Step 2: MongoDB cache check ───────────────────────────────
+                cached = get_cached_profile(candidate_email) if candidate_email else None
+
+                if cached:
+                    st.session_state.agent1_result         = cached
+                    st.session_state['profile_from_cache'] = True
+                    name = cached.get("resume", {}).get("name", candidate_email)
+                    # Auto-run Agent 2 immediately with cached profile + new JD
+                    with st.spinner(f"Profile found for {name} — analyzing match..."):
+                        agent2_result = evaluate(
+                            candidate_json=json.dumps(slim_agent1_result(cached)),
+                            job_role=job_role,
+                            job_description=job_description,
+                        )
+                        st.session_state.agent2_result = agent2_result
+                else:
+                    # ── Step 3: Full parse + scrape ───────────────────────────
+                    with st.spinner("Parsing resume and scraping GitHub..."):
+                        quick_data    = a1.parse_resume(file_bytes, resume_file.name)
+                        github_url    = quick_data.get("github_url", "")
+                        github_data   = a1.scrape_github(github_url) if github_url else {}
+                        agent1_result = {"resume": quick_data, "github": github_data}
+                        st.session_state.agent1_result         = agent1_result
+                        st.session_state['profile_from_cache'] = False
+                        save_profile_cache(agent1_result)
+
+        # ── Show cache hit notice ─────────────────────────────────────────────
+        if st.session_state.get('profile_from_cache') and st.session_state.agent1_result:
+            name  = st.session_state.agent1_result.get("resume", {}).get("name", "this candidate")
+            email = st.session_state.agent1_result.get("resume", {}).get("email", "")
+            st.markdown(f"""
+            <div style='background:rgba(62,207,178,0.08);border:1px solid rgba(62,207,178,0.2);border-radius:8px;padding:0.9rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px;'>
+                <span style='color:#3ecfb2;font-size:14px;'>✓</span>
+                <span style='font-size:13px;color:rgba(240,240,245,0.7);'>Profile loaded from database for <strong style='color:#f0f0f5;'>{name}</strong> ({email}) — GitHub scraping skipped.</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # ── GitHub prompt only if NOT from cache and github scrape failed ─────
+        if st.session_state.agent1_result and not st.session_state.agent2_result \
+                and not st.session_state.get('profile_from_cache'):
+
+            github_url  = st.session_state.agent1_result.get("resume", {}).get("github_url", "")
+            github_data = st.session_state.agent1_result.get("github", {})
+            github_ok   = bool(github_url and github_data
+                               and github_data.get("candidate_profile"))
+
+            if not github_ok:
                 st.markdown("<br>", unsafe_allow_html=True)
-                st.warning("No GitHub URL found in resume. Add one manually or skip.")
+                if github_url and not github_ok:
+                    st.warning(f"GitHub URL found ({github_url}) but scraping failed. Enter manually or skip.")
+                else:
+                    st.warning("No GitHub URL found in resume. Add one manually or skip.")
                 col_gh, col_skip = st.columns([3, 1])
                 with col_gh:
                     manual_github = st.text_input(
@@ -634,9 +961,6 @@ elif st.session_state.view == 'employer':
                         placeholder="https://github.com/username",
                         key="manual_github"
                     )
-                    # Save to session state immediately
-                    if manual_github:
-                        st.session_state['pending_github'] = manual_github
                 with col_skip:
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.button("Skip GitHub", key="skip_gh")
@@ -644,37 +968,38 @@ elif st.session_state.view == 'employer':
                 col_analyze, _ = st.columns([1, 2])
                 with col_analyze:
                     if st.button("📊  Analyze Match", use_container_width=True, key="analyze_match"):
-                        
-                        # Read directly from the text input's session state key
                         pending_gh = st.session_state.get('manual_github', '').strip()
-                        
                         if pending_gh:
-                            with st.spinner("Scraping GitHub profile — this may take a few minutes..."):
-                                a1 = Agent1()
+                            with st.spinner("Scraping GitHub profile..."):
+                                a1      = Agent1()
                                 scraped = a1.scrape_github(pending_gh)
-                                updated_result = dict(st.session_state.agent1_result)
-                                updated_result["github"] = scraped
-                                updated_result["resume"] = dict(st.session_state.agent1_result["resume"])
-                                updated_result["resume"]["github_url"] = pending_gh
-                                st.session_state.agent1_result = updated_result
-                                st.session_state['pending_github'] = ''  # clear after use
+                                updated = dict(st.session_state.agent1_result)
+                                updated["github"] = scraped
+                                updated["resume"] = dict(st.session_state.agent1_result["resume"])
+                                updated["resume"]["github_url"] = pending_gh
+                                st.session_state.agent1_result  = updated
+                                save_profile_cache(updated)
 
                         with st.spinner("Evaluating candidate match..."):
+                            saved_role = st.session_state.get('saved_job_role', job_role)
+                            saved_jd   = st.session_state.get('saved_job_description', job_description)
                             agent2_result = evaluate(
                                 candidate_json=json.dumps(slim_agent1_result(st.session_state.agent1_result)),
-                                job_role=st.session_state.get('saved_job_role', job_role),
-                                job_description=st.session_state.get('saved_job_description', job_description),
+                                job_role=saved_role,
+                                job_description=saved_jd,
                             )
                             st.session_state.agent2_result = agent2_result
             else:
                 st.markdown("<br>", unsafe_allow_html=True)
-                st.success(f"GitHub found: {github_found}")
+                st.success(f"GitHub found: {github_url}")
                 if st.button("📊  Analyze Match", use_container_width=True, key="analyze_match_auto"):
                     with st.spinner("Evaluating candidate match..."):
+                        saved_role = st.session_state.get('saved_job_role', job_role)
+                        saved_jd   = st.session_state.get('saved_job_description', job_description)
                         agent2_result = evaluate(
                             candidate_json=json.dumps(slim_agent1_result(st.session_state.agent1_result)),
-                            job_role=job_role,
-                            job_description=job_description,
+                            job_role=saved_role,
+                            job_description=saved_jd,
                         )
                         st.session_state.agent2_result = agent2_result
 
@@ -727,29 +1052,54 @@ elif st.session_state.view == 'employer':
                         """, unsafe_allow_html=True)
 
                     with st.expander("📁 Matched Repositories"):
-                        matched = gs.get("matched_repos", [])
-                        unmatched = gs.get("unmatched_count", 0)
+                        matched    = gs.get("matched_repos", [])
+                        unmatched  = gs.get("unmatched_count", 0)
                         match_note = gs.get("match_note", "")
+
+                        import re as _re
+                        def sanitize(text):
+                            """Strip any HTML tags that Gemini may have included in text fields."""
+                            if not isinstance(text, str):
+                                return str(text)
+                            return _re.sub(r'<[^>]+>', '', text).strip()
+
                         if not matched:
-                            st.info("No repositories matched the job description.")
+                            st.markdown(f"""
+                            <div style='background:#0c0c12;border:1px solid rgba(255,95,87,0.15);border-radius:10px;padding:1.5rem;border-left:3px solid rgba(255,95,87,0.4);'>
+                                <div style='font-size:10px;font-weight:700;color:#ff5f57;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;'>No Matching Repositories</div>
+                                <p style='color:rgba(240,240,245,0.55);font-size:13px;line-height:1.7;margin:0;'>{sanitize(match_note) or "None of the candidate's repositories directly demonstrate skills required for this role."}</p>
+                                <p style='color:rgba(240,240,245,0.3);font-size:12px;margin:10px 0 0 0;'>{unmatched} repo(s) reviewed and excluded.</p>
+                            </div>
+                            """, unsafe_allow_html=True)
                         else:
-                            st.markdown(f"<p style='color:rgba(255,255,255,0.4);font-size:12px;margin-bottom:1rem;'>{match_note} ({unmatched} repos excluded)</p>", unsafe_allow_html=True)
+                            st.markdown(f"<p style='color:rgba(240,240,245,0.35);font-size:12px;margin-bottom:1rem;font-style:italic;'>{sanitize(match_note)} ({unmatched} repos excluded)</p>", unsafe_allow_html=True)
                             for r in matched:
-                                qcolor = {"Advanced":"#22c55e","Expert":"#00e676","Intermediate":"#f59e0b","Beginner":"#ef4444"}.get(r.get("quality_rating",""), "#94a3b8")
-                                lang_pills = "".join([f"<span style='background:rgba(79,142,247,0.15);border:1px solid rgba(79,142,247,0.3);color:#4f8ef7;padding:2px 8px;border-radius:12px;font-size:10px;margin:2px;display:inline-block;'>{l}</span>" for l in r.get("languages",[])])
-                                skill_pills = "".join([f"<span style='background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);color:#a78bfa;padding:2px 8px;border-radius:12px;font-size:10px;margin:2px;display:inline-block;'>{s}</span>" for s in r.get("key_skills",[])])
+                                # Sanitize all text fields — Gemini sometimes bleeds HTML into JSON values
+                                repo_name   = sanitize(r.get("name", ""))
+                                repo_reason = sanitize(r.get("relevance_reason", ""))
+                                repo_rating = sanitize(r.get("quality_rating", ""))
+                                repo_langs  = [sanitize(l) for l in r.get("languages", []) if sanitize(l)]
+                                repo_skills = [sanitize(s) for s in r.get("key_skills", []) if sanitize(s)]
+                                repo_stars  = r.get("stars", 0)
+                                repo_commits= r.get("commits", 0)
+
+                                qcolor       = {"Advanced":"#3ecfb2","Expert":"#3ecfb2","Intermediate":"#e8c547","Beginner":"#ff5f57"}.get(repo_rating, "#94a3b8")
+                                lang_pills   = "".join([f"<span style='background:rgba(62,207,178,0.1);border:1px solid rgba(62,207,178,0.25);color:#3ecfb2;padding:2px 9px;border-radius:5px;font-size:10px;margin:2px;display:inline-block;font-weight:500;'>{l}</span>" for l in repo_langs])
+                                skill_pills  = "".join([f"<span style='background:rgba(232,197,71,0.08);border:1px solid rgba(232,197,71,0.2);color:#e8c547;padding:2px 9px;border-radius:5px;font-size:10px;margin:2px;display:inline-block;font-weight:500;'>{s}</span>" for s in repo_skills])
+                                quality_badge = f"<span style='font-size:10px;font-weight:700;color:{qcolor};background:{qcolor}18;padding:2px 9px;border-radius:5px;border:1px solid {qcolor}44;'>{repo_rating}</span>" if repo_rating else ""
+
                                 st.markdown(f"""
-                                <div style='background:#0e0e20;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1.25rem;margin-bottom:0.75rem;'>
+                                <div style='background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:1.25rem;margin-bottom:0.6rem;'>
                                     <div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;'>
-                                        <div style='font-size:14px;font-weight:700;color:white;'>{r.get("name","")}</div>
-                                        <div style='display:flex;gap:8px;align-items:center;'>
-                                            {"<span style='font-size:10px;font-weight:700;color:"+qcolor+";background:"+qcolor+"22;padding:2px 8px;border-radius:10px;'>"+r.get("quality_rating","")+"</span>" if r.get("quality_rating") else ""}
-                                            <span style='font-size:11px;color:rgba(255,255,255,0.3);'>⭐ {r.get("stars",0)}  📝 {r.get("commits",0)} commits</span>
+                                        <div style='font-size:14px;font-weight:600;color:#f0f0f5;'>{repo_name}</div>
+                                        <div style='display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:12px;'>
+                                            {quality_badge}
+                                            <span style='font-size:11px;color:rgba(240,240,245,0.3);white-space:nowrap;'>⭐ {repo_stars} · {repo_commits} commits</span>
                                         </div>
                                     </div>
-                                    <p style='color:rgba(255,255,255,0.5);font-size:12px;line-height:1.6;margin:0 0 10px 0;font-style:italic;'>{r.get("relevance_reason","")}</p>
+                                    <p style='color:rgba(240,240,245,0.45);font-size:12px;line-height:1.6;margin:0 0 10px 0;font-style:italic;'>{repo_reason}</p>
                                     <div>{lang_pills}</div>
-                                    <div style='margin-top:6px;'>{skill_pills}</div>
+                                    <div style='margin-top:5px;'>{skill_pills}</div>
                                 </div>
                                 """, unsafe_allow_html=True)
 
@@ -838,38 +1188,39 @@ elif st.session_state.view == 'employer':
             st.markdown("<br>", unsafe_allow_html=True)
 
             rec = results.get("RECOMMENDATION", "CONSIDER")
-            rec_color = {"HIRE": "#22c55e", "CONSIDER": "#f59e0b", "REJECT": "#ef4444"}.get(rec, "#888")
+            rec_color = {"HIRE": "#3ecfb2", "CONSIDER": "#e8c547", "REJECT": "#ff5f57"}.get(rec, "#888")
+            rec_bg    = {"HIRE": "rgba(62,207,178,0.1)", "CONSIDER": "rgba(232,197,71,0.1)", "REJECT": "rgba(255,95,87,0.1)"}.get(rec, "rgba(255,255,255,0.05)")
 
-            st.markdown(f"""
-                <div style='display:inline-block;padding:6px 24px;background:{rec_color}22;
-                border:1px solid {rec_color};border-radius:20px;margin-bottom:1.5rem;'>
-                    <span style='color:{rec_color};font-weight:700;font-size:12px;letter-spacing:3px;'>{rec}</span>
-                </div>
-            """, unsafe_allow_html=True)
+            overall     = results.get("OVERALL_SCORE", 0)
+            score_color = "#3ecfb2" if overall >= 70 else "#e8c547" if overall >= 40 else "#ff5f57"
 
-            overall = results.get("OVERALL_SCORE", 0)
-            score_color = "#22c55e" if overall >= 70 else "#f59e0b" if overall >= 40 else "#ef4444"
-
-            st.markdown(f"""
-                <div style='margin-bottom:1.5rem;'>
-                    <div style='font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);
-                    text-transform:uppercase;margin-bottom:8px;'>Overall Score</div>
-                    <div style='font-size:72px;font-weight:900;color:{score_color};
-                    font-family:Arial Black;line-height:1;'>{overall}
-                        <span style='font-size:24px;color:rgba(255,255,255,0.25);'>/100</span>
+            # Header row
+            col_score, col_verdict = st.columns([1, 2])
+            with col_score:
+                st.markdown(f"""
+                <div style='background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:1.75rem;text-align:center;position:relative;overflow:hidden;'>
+                    <div style='position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,{score_color},transparent);opacity:0.6;'></div>
+                    <div style='font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:12px;font-weight:600;'>Interview Score</div>
+                    <div style='font-size:64px;font-weight:700;color:{score_color};line-height:1;font-variant-numeric:tabular-nums;'>{overall}</div>
+                    <div style='font-size:12px;color:rgba(240,240,245,0.3);margin-top:4px;'>out of 100</div>
+                    <div style='display:inline-block;padding:5px 16px;background:{rec_bg};border:1px solid {rec_color}55;border-radius:6px;margin-top:1rem;'>
+                        <span style='color:{rec_color};font-weight:700;font-size:10px;letter-spacing:2.5px;'>{rec}</span>
                     </div>
                 </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
-            st.markdown(f"""
-                <div style='background:#13132a;border:1px solid rgba(255,255,255,0.06);
-                border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem;'>
-                    <div style='font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);
-                    text-transform:uppercase;margin-bottom:8px;'>Summary</div>
-                    <p style='color:rgba(255,255,255,0.7);font-size:14px;line-height:1.8;margin:0;'>
-                        {results.get("SUMMARY","")}</p>
+            with col_verdict:
+                st.markdown(f"""
+                <div style='background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:1.75rem;height:100%;position:relative;overflow:hidden;'>
+                    <div style='position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e8c547,rgba(232,197,71,0.2));border-radius:2px 0 0 2px;'></div>
+                    <div style='font-size:9px;letter-spacing:3.5px;color:rgba(240,240,245,0.35);text-transform:uppercase;margin-bottom:10px;font-weight:600;'>Summary</div>
+                    <p style='color:rgba(240,240,245,0.75);font-size:14px;line-height:1.9;margin:0;font-weight:300;'>{results.get("SUMMARY","")}</p>
                 </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<span class='label'>Score Breakdown</span>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
 
             interview_categories = [
                 ("Technicality",    "TECHNICALITY",    "TECHNICALITY_FEEDBACK"),
@@ -879,32 +1230,25 @@ elif st.session_state.view == 'employer':
                 ("Confidence",      "CONFIDENCE",       "CONFIDENCE_FEEDBACK"),
             ]
 
-            st.markdown("<span class='label'>Score Breakdown</span>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            left_cards = ""
+            left_cards  = ""
             right_cards = ""
             for i, (label, score_key, feedback_key) in enumerate(interview_categories):
-                score = results.get(score_key, 0)
+                score    = results.get(score_key, 0)
                 feedback = results.get(feedback_key, "No feedback available.")
-                bar_color = "#22c55e" if score >= 70 else "#f59e0b" if score >= 40 else "#ef4444"
-                card = f"""
-                <div style='background:#0e0e20;border:1px solid rgba(255,255,255,0.06);
-                border-radius:14px;padding:1.5rem;margin-bottom:1rem;'>
-                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;'>
-                        <span style='font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);
-                        text-transform:uppercase;letter-spacing:2px;'>{label}</span>
-                        <span style='font-size:28px;font-weight:900;color:{bar_color};
-                        font-family:Arial Black;line-height:1;'>{score}</span>
+                bc       = "#3ecfb2" if score >= 70 else "#e8c547" if score >= 40 else "#ff5f57"
+                card     = f"""
+                <div style='background:#0c0c12;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:1.5rem;margin-bottom:0.75rem;'>
+                    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>
+                        <span style='font-size:10px;font-weight:600;color:rgba(240,240,245,0.4);text-transform:uppercase;letter-spacing:2.5px;'>{label}</span>
+                        <span style='font-size:26px;font-weight:700;color:{bc};line-height:1;font-variant-numeric:tabular-nums;'>{score}</span>
                     </div>
-                    <div style='background:rgba(255,255,255,0.06);border-radius:4px;height:3px;margin-bottom:16px;'>
-                        <div style='background:{bar_color};width:{score}%;height:3px;border-radius:4px;
-                        box-shadow:0 0 10px {bar_color}88;'></div>
+                    <div style='background:rgba(255,255,255,0.04);border-radius:3px;height:3px;margin-bottom:14px;'>
+                        <div style='background:{bc};width:{score}%;height:3px;border-radius:3px;box-shadow:0 0 8px {bc}66;'></div>
                     </div>
-                    <p style='font-size:13px;color:rgba(255,255,255,0.6);margin:0;line-height:1.8;'>{feedback}</p>
+                    <p style='font-size:13px;color:rgba(240,240,245,0.55);margin:0;line-height:1.8;font-weight:300;'>{feedback}</p>
                 </div>"""
                 if i % 2 == 0: left_cards += card
-                else: right_cards += card
+                else:          right_cards += card
 
             col1, col2 = st.columns(2)
             with col1: st.markdown(left_cards, unsafe_allow_html=True)
@@ -953,6 +1297,7 @@ elif st.session_state.view == 'candidate':
             st.session_state.agent1_result = None
             st.session_state.agent2_result = None
             st.session_state.pop("github_summary", None)
+            st.session_state.pop("profile_from_cache", None)
             st.session_state.view = 'home'
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
@@ -977,58 +1322,118 @@ elif st.session_state.view == 'candidate':
         elif not job_role or not job_description:
             st.warning("Please enter the job role and description.")
         else:
-            with st.spinner("Parsing your resume and GitHub profile..."):
-                agent1_result = Agent1().run(resume_file.read(), resume_file.name)
-                st.session_state.agent1_result = agent1_result
-                st.session_state.agent2_result = None
+            st.session_state['saved_job_role']        = job_role
+            st.session_state['saved_job_description'] = job_description
+            st.session_state.agent2_result            = None
+            st.session_state.pop("github_summary", None)
+            st.session_state['profile_from_cache']    = False
 
-            # Check if GitHub was found
-            github_found = agent1_result.get("resume", {}).get("github_url", "")
-            github_data  = agent1_result.get("github", {})
+            file_bytes = resume_file.read()
 
-            if github_found and github_data:
-                with st.spinner("Analyzing your match..."):
+            # ── Step 1: Extract email from raw text (no Gemini needed) ────────
+            with st.spinner("Reading your resume..."):
+                a1         = Agent1()
+                raw_text   = a1._extract_text(file_bytes, resume_file.name)
+                # Fast regex email extraction — no API call
+                import re as _re
+                email_match    = _re.search(r'[\w.\-+]+@[\w\-]+\.[a-zA-Z]{2,}', raw_text)
+                candidate_email = email_match.group(0).lower().strip() if email_match else ""
+
+            # ── Step 2: MongoDB cache check ───────────────────────────────────
+            cached = get_cached_profile(candidate_email) if candidate_email else None
+
+            if cached:
+                st.session_state.agent1_result         = cached
+                st.session_state['profile_from_cache'] = True
+                # Auto-run Agent 2 immediately — no Gemini parsing needed
+                with st.spinner("Profile found — analyzing your match..."):
                     agent2_result = evaluate(
-                        candidate_json=json.dumps(slim_agent1_result(agent1_result)),
+                        candidate_json=json.dumps(slim_agent1_result(cached)),
                         job_role=job_role,
                         job_description=job_description,
                     )
                     st.session_state.agent2_result = agent2_result
+            else:
+                # ── Step 3: Full parse + scrape ───────────────────────────────
+                with st.spinner("Parsing your resume and scraping GitHub..."):
+                    quick_data  = a1.parse_resume(file_bytes, resume_file.name)
+                    github_url  = quick_data.get("github_url", "")
+                    github_data = a1.scrape_github(github_url) if github_url else {}
+                    agent1_result = {"resume": quick_data, "github": github_data}
+                    st.session_state.agent1_result         = agent1_result
+                    st.session_state['profile_from_cache'] = False
+                    save_profile_cache(agent1_result)
 
-    # GitHub prompt for candidate if not found
-    if st.session_state.agent1_result and not st.session_state.agent2_result:
-        github_found = st.session_state.agent1_result.get("resume", {}).get("github_url", "")
-        github_data  = st.session_state.agent1_result.get("github", {})
+                # If GitHub scrape succeeded, auto-run Agent 2
+                github_ok = bool(
+                    agent1_result.get("resume", {}).get("github_url") and
+                    agent1_result.get("github", {}).get("candidate_profile")
+                )
+                if github_ok:
+                    with st.spinner("Analyzing your match..."):
+                        agent2_result = evaluate(
+                            candidate_json=json.dumps(slim_agent1_result(agent1_result)),
+                            job_role=job_role,
+                            job_description=job_description,
+                        )
+                        st.session_state.agent2_result = agent2_result
 
-        if not github_found or not github_data:
+    # ── Show cache hit notice ─────────────────────────────────────────────────
+    if st.session_state.get('profile_from_cache') and st.session_state.agent1_result:
+        name  = st.session_state.agent1_result.get("resume", {}).get("name", "your profile")
+        email = st.session_state.agent1_result.get("resume", {}).get("email", "")
+        st.markdown(f"""
+        <div style='background:rgba(62,207,178,0.08);border:1px solid rgba(62,207,178,0.2);border-radius:8px;padding:0.9rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px;'>
+            <span style='color:#3ecfb2;font-size:14px;'>✓</span>
+            <span style='font-size:13px;color:rgba(240,240,245,0.7);'>Existing profile found for <strong style='color:#f0f0f5;'>{name}</strong> — analysis ran instantly without re-scraping.</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ── GitHub manual entry — only if NOT cache hit and scrape failed ─────────
+    if st.session_state.agent1_result and not st.session_state.agent2_result \
+            and not st.session_state.get('profile_from_cache'):
+
+        github_url  = st.session_state.agent1_result.get("resume", {}).get("github_url", "")
+        github_data = st.session_state.agent1_result.get("github", {})
+        github_ok   = bool(github_url and github_data
+                           and github_data.get("candidate_profile"))
+
+        if not github_ok:
             st.markdown("<br>", unsafe_allow_html=True)
-            st.warning("No GitHub URL found in your resume. Add one or skip.")
+            if github_url and not github_ok:
+                st.warning(f"GitHub URL found ({github_url}) but scraping failed. Enter it manually or skip.")
+            else:
+                st.warning("No GitHub URL found in your resume. Add one or skip.")
+
             col_gh, col_skip = st.columns([3, 1])
             with col_gh:
                 manual_github = st.text_input(
                     "GitHub URL (optional)",
                     placeholder="https://github.com/username",
-                    key="manual_github"
+                    key="manual_github_can"
                 )
-                # Save immediately on every render
-                st.session_state['pending_github'] = st.session_state.get('manual_github', '')
             with col_skip:
                 st.markdown("<br>", unsafe_allow_html=True)
                 st.button("Skip", key="can_skip_gh")
 
             if st.button("✨  Analyze Match", use_container_width=True, key="can_analyze_match"):
+                saved_role = st.session_state.get('saved_job_role', '')
+                saved_jd   = st.session_state.get('saved_job_description', '')
+
                 if manual_github and manual_github.strip():
                     with st.spinner("Scraping your GitHub..."):
-                        a1 = Agent1()
+                        a1          = Agent1()
                         github_data = a1.scrape_github(manual_github.strip())
-                        st.session_state.agent1_result["github"] = github_data
+                        st.session_state.agent1_result["github"]               = github_data
                         st.session_state.agent1_result["resume"]["github_url"] = manual_github.strip()
+                        save_profile_cache(st.session_state.agent1_result)
+                        st.session_state.pop("github_summary", None)
 
                 with st.spinner("Analyzing your match..."):
                     agent2_result = evaluate(
                         candidate_json=json.dumps(slim_agent1_result(st.session_state.agent1_result)),
-                        job_role=job_role,
-                        job_description=job_description,
+                        job_role=saved_role,
+                        job_description=saved_jd,
                     )
                     st.session_state.agent2_result = agent2_result
 
