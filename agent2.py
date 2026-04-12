@@ -1,21 +1,12 @@
-"""
-agent2.py — AI Match Evaluator for Hire.AI
-Uses Gemini API to evaluate candidate JSON against job role + description.
-"""
-
-import os
-os.environ["GRPC_VERBOSITY"] = "ERROR"
-os.environ["GLOG_minloglevel"] = "2"
-
 import json
 import re
 from google import genai
 from google.genai import types
 
-# ── Hardcoded Gemini API Key ──────────────────────────────────────────────────
-GEMINI_API_KEY = "AIzaSyAijf1IwOqIHMXezTVnSYZNLn8_X76jetQ"   # <-- paste your key here
+from agent1 import Agent1
 
-# ── System Prompt ─────────────────────────────────────────────────────────────
+GEMINI_API_KEY = "AIzaSyDLRgjn9OBl4PAfQTlyrXf6LRPy0pPWmro"
+
 SYSTEM_PROMPT = """You are an expert AI hiring-match evaluator. Compare candidate_json against job_role and job_description. Return ONLY valid JSON, no markdown, no backticks, no explanation.
 Scoring: 90-100=Excellent, 75-89=Good, 60-74=Moderate, 40-59=Weak, 0-39=Poor.
 Rules: no score inflation, prefer evidence from experience/projects over skill lists, reduce score for missing must-haves.
@@ -24,8 +15,7 @@ Return this exact JSON structure:
 For visual_data categories use 6-8 of: Programming, Machine Learning/AI, NLP/LLM, Cloud/Deployment, Data Engineering, MLOps/Production, Domain Alignment, Overall Experience Relevance. Scores must reflect actual evidence.
 Return ONLY the JSON object. No markdown. No explanation. No backticks."""
 
-# ── Model fallback chain ──────────────────────────────────────────────────────
-MODELS_TO_TRY = [
+MODELS = [
     "gemini-2.5-flash",
     "gemini-2.5-pro",
     "gemini-2.0-flash",
@@ -33,135 +23,55 @@ MODELS_TO_TRY = [
 ]
 
 
-def score_to_verdict(score: int) -> str:
-    if score >= 90:   return "very_strong"
-    elif score >= 75: return "strong"
-    elif score >= 60: return "good"
-    elif score >= 45: return "moderate"
-    elif score >= 25: return "poor"
-    else:             return "very_poor"
+class Agent2:
 
-def get_score_color(score: int) -> str:
-    if score >= 90:   return "#00e676"
-    elif score >= 75: return "#43e97b"
-    elif score >= 60: return "#6c63ff"
-    elif score >= 45: return "#ffc400"
-    elif score >= 25: return "#ff6b6b"
-    else:             return "#b41e1e"
+    def __init__(self):
+        self.client = genai.Client(api_key=GEMINI_API_KEY)
 
-def get_verdict_emoji(verdict: str) -> str:
-    return {
-        "very_strong": "🏆",
-        "strong":      "✅",
-        "good":        "⚡",
-        "moderate":    "🔶",
-        "poor":        "⚠️",
-        "very_poor":   "❌",
-    }.get(verdict, "⚠️")
-
-def get_verdict_label(verdict: str) -> str:
-    return {
-        "very_strong": "VERY STRONG MATCH",
-        "strong":      "STRONG MATCH",
-        "good":        "GOOD MATCH",
-        "moderate":    "MODERATE MATCH",
-        "poor":        "POOR MATCH",
-        "very_poor":   "VERY POOR MATCH",
-    }.get(verdict, "POOR MATCH")
-
-# ── JSON cleaner ──────────────────────────────────────────────────────────────
-
-def clean_json(text: str) -> str:
-    text = text.strip()
-    text = re.sub(r'^```json\s*', '', text)
-    text = re.sub(r'^```\s*',     '', text)
-    text = re.sub(r'\s*```$',     '', text)
-    return text.strip()
-
-# ── Core evaluate function ────────────────────────────────────────────────────
-
-def evaluate(
-    candidate_json: str,
-    job_role: str,
-    job_description: str,
-    status_fn=None,          # optional callable(str) for live UI status updates
-) -> dict:
-    """
-    Sends candidate profile JSON + job details to Gemini.
-    Tries each model in MODELS_TO_TRY, returns parsed result dict.
-    Raises last exception if all models fail.
-
-    Args:
-        candidate_json   : JSON string from agent1 run_agent1()
-        job_role         : e.g. "Software Engineer"
-        job_description  : full job description text
-        status_fn        : optional callable for status messages (e.g. st.toast)
-
-    Returns:
-        result dict with keys: match_score, strengths, gaps, skill_coverage, etc.
-    """
-
-    def log(msg):
-        if status_fn:
-            status_fn(msg)
-        else:
-            print(msg)
-
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    prompt = (
-        f"candidate_json:\n{candidate_json}\n\n"
-        f"job_role: {job_role}\n\n"
-        f"job_description:\n{job_description}"
-    )
-
-    last_error = None
-    for model_name in MODELS_TO_TRY:
-        try:
-            log(f"🤖 Trying model: {model_name}...")
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    temperature=0.1,
+    def evaluate(self, candidate_json: dict, job_role: str, job_description: str) -> dict:
+        prompt = (
+            f"candidate_json:\n{json.dumps(candidate_json, indent=2)}\n\n"
+            f"job_role: {job_role}\n\n"
+            f"job_description:\n{job_description}"
+        )
+        for model in MODELS:
+            try:
+                print(f"  🤖 Trying {model}...")
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        temperature=0.1,
+                    )
                 )
-            )
-            result = json.loads(clean_json(response.text))
-            log(f"✅ Success with {model_name}")
-            return result
+                raw = response.text.strip()
+                raw = re.sub(r'^```json\s*', '', raw)
+                raw = re.sub(r'^```\s*',     '', raw)
+                raw = re.sub(r'\s*```$',     '', raw)
+                print(f"  ✅ Done with {model}")
+                return json.loads(raw)
 
-        except json.JSONDecodeError as e:
-            log(f"❌ JSON parse error from {model_name}: {e}")
-            raise e
-        except Exception as e:
-            last_error = e
-            log(f"⚠️ {model_name} failed — trying next...")
-            continue
+            except json.JSONDecodeError as e:
+                print(f"  ❌ JSON parse error: {e}")
+                raise
+            except Exception as e:
+                print(f"  ⚠️ {model} failed: {e}")
+                continue
 
-    raise last_error
+        return {"error": "All models failed."}
 
 
-# ─── CLI entry point ──────────────────────────────────────────────────────────
+
 if __name__ == "__main__":
-    import sys
 
-    profile_path = "outputs/candidate_profile.json"
-    if not os.path.exists(profile_path):
-        print(f"❌ No profile found at {profile_path}. Run agent1 first.")
-        sys.exit(1)
+    job_role        = "Data Scientist"
+    job_description = "MINIMUM REQUIREMENTS: Bachelor’s degree in Data Science, Statistics, Computer Science, Information Systems, or related quantitative field. 5+ years of progressive experience performing advanced data analytics in audit, investigation, fraud detection, or compliance environments. Expert proficiency with Python, R, SQL, Power BI, Alteryx, ACL, and cloud‑based analytics platforms. 3+ years of experience developing analytical solutions using cloud native tools and APIs for ETL, storage, and analysis. PREFERRED: Master’s degree in Data Science, Data Analytics, Statistics, Computer Science, Information Systems, or other fields related to data analysis, machine learning, artificial intelligence, business information management, or forensic accounting. Professional certifications such as CFE, CIA, CISA, or equivalent. Advanced proficiency performing statistical analysis using data analytics software packages, or cloud native tools. Strong analytic skills related to working with unstructured datasets. Knowledge of working with JSON format data, including parsing and stringifying. Experience designing and implementing Artificial Intelligence strategy. Experience presenting analytic evidence in criminal, civil, or administrative proceedings. Investigative experience with an emphasis on complex white-collar crimes involving contracts, procurement, vendors, finance, human resources, public corruption, revenue, and health care. Broad knowledge of the laws, practices, and procedures of federal Offices of Inspector General. Familiarity with passenger rail or transportation operations"
 
-    with open(profile_path) as f:
-        candidate_json = f.read()
+    with open("output.json") as f:
+        candidate_json = json.load(f)
 
-    job_role = input("Job Role: ").strip()
-    print("Job Description (type END to finish):")
-    lines = []
-    while True:
-        line = input()
-        if line.strip() == "END":
-            break
-        lines.append(line)
-    job_description = "\n".join(lines)
-
-    result = evaluate(candidate_json, job_role, job_description)
+    result = Agent2().evaluate(candidate_json, job_role, job_description)
     print(json.dumps(result, indent=2))
+    with open("output1.json", "w") as f:
+        json.dump(result, f, indent=2)
