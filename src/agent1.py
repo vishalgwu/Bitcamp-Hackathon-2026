@@ -1,436 +1,484 @@
-import os
-import json
-import sys
-import tkinter as tk
-from tkinter import filedialog, simpledialog, messagebox
+"""
+agent1.py — Resume Parser + GitHub Scraper
+"""
+
+import os, io, json, time, base64, threading, concurrent.futures, requests
+from google import genai
+from PyPDF2 import PdfReader
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Add helpers to path
-sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
+# ── API Keys ──────────────────────────────────────────────────────────────────
+GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY")
+GEMINI_CODE_KEY = os.environ.get("GEMINI_CODE_KEY") or os.environ.get("GEMINI_API_KEY")
+GITHUB_TOKEN    = os.environ.get("GITHUB_TOKEN")
 
-from helper.resume_parser     import parse_resume
-from helper.github_scraper    import scrape_github, get_profile
-from helper.portfolio_scraper import scrape_portfolio
-from helper.rag_extractor     import (
-    build_vectorstore,
-    query_github_url,
-    query_linkedin_url,
-    query_portfolio_url,
-    extract_portfolio_from_github
-)
-from helper.db import get_db, create_collections, save_student_profile
 
-# ─── Profile Merger ───────────────────────────────────────
+class Agent1:
 
-def merge_profiles(resume_data, github_data, portfolio_data):
-
-    resume_skills    = resume_data.get("skills", [])
-    github_languages = github_data.get("all_languages", [])
-    portfolio_skills = portfolio_data.get(
-        "structured", {}
-    ).get("skills", [])
-    code_skills      = github_data.get(
-        "code_analysis", {}
-    ).get("skills_from_code", [])
-
-    all_skills = list(set(
-        [s.lower() for s in resume_skills]    +
-        [l.lower() for l in github_languages] +
-        [s.lower() for s in portfolio_skills] +
-        [s.lower() for s in code_skills]
-    ))
-
-    github_repos = [
-        {
-            "name":          repo["name"],
-            "description":   repo.get("description", ""),
-            "technologies":  repo.get("languages", []),
-            "source":        "github",
-            "stars":         repo.get("stars", 0),
-            "forks":         repo.get("forks", 0),
-            "commit_count":  repo.get("commit_count", 0),
-            "last_updated":  repo.get("last_updated", ""),
-            "readme":        repo.get("readme_preview", ""),
-            "topics":        repo.get("topics", []),
-            "has_live_demo": repo.get("has_live_demo", False),
-            "homepage":      repo.get("homepage", ""),
-            "is_fork":       repo.get("is_fork", False),
-            "code_samples":  repo.get("code_samples", {}),
-            "code_insights": repo.get("code_insights", {})
-        }
-        for repo in github_data.get("repositories", [])
+    MODELS = [
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
     ]
 
-    return {
-        "candidate": {
-            "name":     (
-                resume_data.get("name") or
-                github_data.get("name")
-            ),
-            "email":    (
-                resume_data.get("email") or
-                github_data.get("email")
-            ),
-            "phone":    resume_data.get("phone"),
-            "location": (
-                resume_data.get("location") or
-                github_data.get("location")
-            ),
-            "summary":  resume_data.get("summary")
-        },
-        "skills": {
-            "all":            all_skills,
-            "from_resume":    resume_skills,
-            "from_github":    github_languages,
-            "from_portfolio": portfolio_skills,
-            "from_code":      code_skills
-        },
-        "experience":     resume_data.get("experience", []),
-        "education":      resume_data.get("education", []),
-        "certifications": resume_data.get("certifications", []),
-        "projects": {
-            "from_resume":    resume_data.get("projects", []),
-            "from_github":    github_repos,
-            "from_portfolio": portfolio_data.get(
-                "structured", {}
-            ).get("projects", [])
-        },
-        "github_profile": {
-            "username":     github_data.get("username"),
-            "bio":          github_data.get("bio"),
-            "website":      github_data.get("website"),
-            "followers":    github_data.get("followers"),
-            "following":    github_data.get("following"),
-            "public_repos": github_data.get("public_repos"),
-            "github_url":   github_data.get("github_url"),
-            "top_repos":    github_data.get("top_repos", [])
-        },
-        "code_analysis": github_data.get("code_analysis", {
-            "repos_analyzed":        0,
-            "skills_from_code":      [],
-            "architecture_patterns": [],
-            "best_practices":        []
-        }),
-        "portfolio": {
-            "url":        portfolio_data.get("url"),
-            "headings":   portfolio_data.get("headings", []),
-            "structured": portfolio_data.get("structured", {})
-        },
-        "links": {
-            "github":    github_data.get("github_url"),
-            "portfolio": portfolio_data.get("url"),
-            "linkedin":  resume_data.get("linkedin_url")
-        },
-        "sources_used": {
-            "resume":        bool(resume_data),
-            "github":        bool(github_data),
-            "portfolio":     bool(portfolio_data),
-            "code_analysis": github_data.get(
-                "code_analysis", {}
-            ).get("repos_analyzed", 0) > 0
-        }
+    CODE_EXTENSIONS = {
+        ".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".cpp", ".c",
+        ".cs", ".go", ".rs", ".swift", ".kt", ".sql", ".ipynb", ".rb"
     }
 
-# ─── Link Prompt Helper ───────────────────────────────────
+    SKIP_PATTERNS = [
+        "package-lock.json", "yarn.lock", ".gitignore", "node_modules",
+        "dist/", "build/", "__pycache__", ".min.js", "vendor/"
+    ]
 
-def prompt_for_link(link_type, description):
-    root = tk.Tk()
-    root.withdraw()
-    root.attributes("-topmost", True)
+    def __init__(self):
+        # Resume parsing + portfolio scraping
+        self.gemini      = genai.Client(api_key=GEMINI_API_KEY)
+        # GitHub code analysis — uses separate quota key
+        self.code_gemini = genai.Client(api_key=GEMINI_CODE_KEY)
+        self.gh_headers  = {
+            "Authorization": f"token {GITHUB_TOKEN}",
+            "Accept":        "application/vnd.github.v3+json"
+        }
 
-    want_to_provide = messagebox.askyesno(
-        title=f"{link_type} URL Not Found",
-        message=(
-            f"{description}\n\n"
-            f"Would you like to provide your {link_type} URL?"
-        )
-    )
+    # =========================================================================
+    # SECTION 1 — RESUME PARSER
+    # =========================================================================
 
-    if not want_to_provide:
-        root.destroy()
-        print(f"  ⏭️  User skipped {link_type} URL")
-        return None
+    def _extract_text(self, file_bytes, filename):
+        ext = os.path.splitext(filename)[1].lower()
+        if ext == ".pdf":
+            try:
+                import pdfplumber
+                with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                    return "\n".join(p.extract_text() or "" for p in pdf.pages)
+            except:
+                try:
+                    reader = PdfReader(io.BytesIO(file_bytes))
+                    return "\n".join(p.extract_text() or "" for p in reader.pages)
+                except:
+                    return ""
+        elif ext in [".docx", ".doc"]:
+            try:
+                from docx import Document
+                doc = Document(io.BytesIO(file_bytes))
+                return "\n".join(p.text for p in doc.paragraphs)
+            except:
+                return ""
+        return file_bytes.decode("utf-8", errors="replace")
 
-    url = simpledialog.askstring(
-        title=f"Enter {link_type} URL",
-        prompt=f"Paste your {link_type} URL below:",
-        parent=root
-    )
+    def _extract_hyperlinks(self, file_bytes, filename):
+        ext = os.path.splitext(filename)[1].lower()
+        links = []
+        if ext == ".pdf":
+            try:
+                import pdfplumber
+                with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                    for page in pdf.pages:
+                        for annot in (page.annots or []):
+                            uri = annot.get("uri") or annot.get("A", {}).get("URI")
+                            if uri and isinstance(uri, str) and uri.startswith("http"):
+                                links.append(uri)
+            except:
+                pass
+        elif ext in [".docx", ".doc"]:
+            try:
+                from docx import Document
+                doc = Document(io.BytesIO(file_bytes))
+                for rel in doc.part.rels.values():
+                    if "hyperlink" in rel.reltype:
+                        url = rel._target
+                        if isinstance(url, str) and url.startswith("http"):
+                            links.append(url)
+            except:
+                pass
+        return list(set(links))
 
-    root.destroy()
+    def _parse_with_gemini(self, text, hyperlinks):
+        links_str = "\n".join(hyperlinks) if hyperlinks else "None found"
+        prompt = f"""
+Extract all structured information from this resume.
+Pay special attention to the hyperlinks list — these are ACTUAL URLs embedded in the document.
+Return ONLY valid JSON — no markdown, no extra text:
 
-    if url and url.strip():
-        url = url.strip()
-        print(f"  ✅ User provided {link_type} URL: {url}")
-        return url
+{{
+    "name": "", "email": "", "phone": "", "location": "", "summary": "",
+    "github_url": "", "linkedin_url": "", "portfolio_url": "",
+    "skills": [],
+    "experience": [{{"role": "", "company": "", "duration": "", "location": "", "description": ""}}],
+    "education": [{{"degree": "", "field": "", "institution": "", "year": ""}}],
+    "certifications": [],
+    "projects": [{{"name": "", "description": "", "technologies": []}}]
+}}
 
-    print(f"  ⏭️  User did not enter a {link_type} URL — skipping")
-    return None
+Hyperlinks found in document:
+{links_str}
 
-# ─── GitHub Scraper Helper ────────────────────────────────
+Resume text:
+{text[:6000]}
+"""
+        return self._gemini_json(prompt)
 
-def scrape_github_profile(github_url):
-    if not github_url:
-        return {}
+    def parse_resume(self, file_bytes, filename):
+        print(f"\n📄 Parsing resume: {filename}")
+        text  = self._extract_text(file_bytes, filename)
+        print(f"  ✅ Extracted {len(text)} chars")
+        links = self._extract_hyperlinks(file_bytes, filename)
+        print(f"  ✅ Found {len(links)} hyperlinks: {links}")
+        result = self._parse_with_gemini(text, links)
+        print(f"  ✅ Parsed successfully")
+        return result
 
-    username     = github_url.rstrip("/").split("/")[-1]
-    _profile     = get_profile(username)
-    public_repos = _profile.get("public_repos", 0)
+    # =========================================================================
+    # SECTION 2 — GITHUB SCRAPER
+    # =========================================================================
 
-    if public_repos > 200:
-        print(
-            f"\n  ⚠️  This account has {public_repos} repos "
-            f"— looks like an org not a person"
-        )
-        confirm = input(
-            "  Are you sure this is the right GitHub URL? (y/n): "
-        ).strip().lower()
-        if confirm != "y":
-            print("  ⏭️  Skipping GitHub scraping.")
+    def _gh_get(self, url, as_list=False):
+        try:
+            r = requests.get(url, headers=self.gh_headers, timeout=10)
+            data = r.json()
+            if r.status_code == 200:
+                return data
+        except Exception:
+            pass
+        return [] if as_list else {}
+
+    def _get_languages(self, username, repo_name):
+        data = self._gh_get(f"https://api.github.com/repos/{username}/{repo_name}/languages")
+        return list(data.keys()) if isinstance(data, dict) else []
+
+    def _get_readme(self, username, repo_name):
+        data = self._gh_get(f"https://api.github.com/repos/{username}/{repo_name}/readme")
+        if isinstance(data, dict) and data.get("content"):
+            try:
+                return base64.b64decode(
+                    data["content"].replace("\n", "")
+                ).decode("utf-8", errors="replace")[:500]
+            except:
+                pass
+        return ""
+
+    def _get_commit_count(self, username, repo_name):
+        try:
+            r = requests.get(
+                f"https://api.github.com/repos/{username}/{repo_name}/commits?per_page=1",
+                headers=self.gh_headers, timeout=10
+            )
+            if r.status_code == 200:
+                if "Link" in r.headers:
+                    try:
+                        last = r.headers["Link"].split(",")[-1]
+                        return int(last.split("page=")[-1].split(">")[0])
+                    except:
+                        pass
+                return len(r.json())
+        except:
+            pass
+        return 0
+
+    def _fetch_repo_code(self, username, repo_name):
+        tree = []
+        for branch in ["main", "master", "HEAD"]:
+            try:
+                r = requests.get(
+                    f"https://api.github.com/repos/{username}/{repo_name}/git/trees/{branch}?recursive=1",
+                    headers=self.gh_headers, timeout=10
+                )
+                if r.status_code == 200:
+                    tree = r.json().get("tree", [])
+                    break
+            except:
+                pass
+
+        files = []
+        for item in tree:
+            if item.get("type") != "blob":
+                continue
+            path = item.get("path", "")
+            if any(s in path for s in self.SKIP_PATTERNS):
+                continue
+            if os.path.splitext(path)[1].lower() not in self.CODE_EXTENSIONS:
+                continue
+            if item.get("size", 0) > 100000:
+                continue
+            files.append(path)
+            if len(files) >= 5:
+                break
+
+        code_samples = {}
+        for path in files:
+            try:
+                r = requests.get(
+                    f"https://api.github.com/repos/{username}/{repo_name}/contents/{path}",
+                    headers=self.gh_headers, timeout=10
+                )
+                if r.status_code == 200:
+                    data = r.json()
+                    if isinstance(data, dict) and data.get("encoding") == "base64":
+                        content = base64.b64decode(
+                            data["content"].replace("\n", "")
+                        ).decode("utf-8", errors="replace")
+                        if content.strip():
+                            code_samples[path] = content
+            except:
+                pass
+
+        return repo_name, code_samples
+
+    def _analyze_code(self, repo_name, code_samples):
+        if not code_samples:
+            return {}
+        code_context = ""
+        for path, content in code_samples.items():
+            code_context += f"\n\n--- {path} ---\n{content[:1500]}"
+        prompt = f"""
+Analyze code from GitHub repo "{repo_name}".
+Return ONLY valid JSON — no markdown:
+
+{{
+    "code_quality": {{"score": 0, "rating": "", "summary": ""}},
+    "technical_complexity": {{"score": 0, "rating": "", "summary": ""}},
+    "architecture_patterns": [],
+    "skills_demonstrated": [],
+    "best_practices_used": [],
+    "areas_for_improvement": [],
+    "overall_assessment": "",
+    "notable_observations": []
+}}
+
+score: 1-10, rating: Beginner/Intermediate/Advanced/Expert
+
+Code:
+{code_context}
+"""
+        return self._code_gemini_json(prompt)
+
+    def _assess_developer(self, repo_details, all_skills, all_languages):
+        summary = f"""
+Repos: {len(repo_details)}
+Languages: {', '.join(all_languages[:10])}
+Skills from code: {', '.join(list(set(all_skills))[:15])}
+Top repos: {[r['name'] for r in sorted(repo_details, key=lambda x: x['stars'], reverse=True)[:5]]}
+"""
+        prompt = f"""
+Assess the developer based on their GitHub profile summary.
+Return ONLY valid JSON — no markdown:
+
+{{
+    "developer_level": "",
+    "strengths": [],
+    "weaknesses": [],
+    "confidence_score": 0.0
+}}
+
+developer_level: Beginner / Intermediate / Advanced / Expert
+
+Profile:
+{summary}
+"""
+        return self._gemini_json(prompt)
+
+    def scrape_github(self, github_url):
+        if not github_url:
+            print("  ⏭️  No GitHub URL — skipping")
             return {}
 
-    print(f"  🚀 Starting GitHub scraping + code analysis...")
+        username = github_url.rstrip("/").split("/")[-1]
+        print(f"\n🐙 Scraping GitHub: {username}")
 
-    return scrape_github(
-        github_url,
-        analyze_code=True,
-        max_repos_to_analyze=0
-    )
+        profile = self._gh_get(f"https://api.github.com/users/{username}")
+        if not profile or "message" in profile:
+            print(f"  ❌ GitHub user not found: {username}")
+            return {}
+        
+        # Use the correct casing from the API response
+        username = profile.get("login", username)
+        print(f"  ✅ Corrected username: {username}")
 
-# ─── Print Summary ────────────────────────────────────────
+        public_repos = profile.get("public_repos", 0)
+        if public_repos > 200:
+            print(f"  ⚠️  Org account ({public_repos} repos) — skipping")
+            return {}
 
-def print_summary(unified_profile, portfolio_url):
+        print(f"  ✅ Profile found — {public_repos} repos")
 
-    print("\n" + "=" * 55)
-    print("              AGENT 1 COMPLETE ✅")
-    print("=" * 55)
-
-    print("\n👤 CANDIDATE")
-    print(f"  Name     : {unified_profile['candidate']['name']}")
-    print(f"  Email    : {unified_profile['candidate']['email']}")
-    print(f"  Phone    : {unified_profile['candidate']['phone']}")
-    print(f"  Location : {unified_profile['candidate']['location']}")
-
-    print("\n🛠️  SKILLS")
-    print(f"  Total unique   : {len(unified_profile['skills']['all'])}")
-    print(f"  From resume    : {len(unified_profile['skills']['from_resume'])} skills")
-    print(f"  From GitHub    : {len(unified_profile['skills']['from_github'])} languages")
-    print(f"  From portfolio : {len(unified_profile['skills']['from_portfolio'])} skills")
-    print(f"  From code      : {len(unified_profile['skills']['from_code'])} skills")
-
-    print("\n💼 EXPERIENCE")
-    for exp in unified_profile.get("experience", []):
-        print(f"  • {exp.get('role')} @ {exp.get('company')} ({exp.get('duration')})")
-
-    print("\n🎓 EDUCATION")
-    for edu in unified_profile.get("education", []):
-        print(f"  • {edu.get('degree')} in {edu.get('field')} — {edu.get('institution')} ({edu.get('year')})")
-
-    print("\n📜 CERTIFICATIONS")
-    for cert in unified_profile.get("certifications", []):
-        print(f"  • {cert}")
-
-    print("\n📁 PROJECTS FROM RESUME")
-    for proj in unified_profile["projects"].get("from_resume", []):
-        print(f"  • {proj.get('name')}")
-
-    print("\n🐙 GITHUB PROFILE")
-    print(f"  Username     : {unified_profile['github_profile'].get('username')}")
-    print(f"  Public repos : {unified_profile['github_profile'].get('public_repos')}")
-    print(f"  Followers    : {unified_profile['github_profile'].get('followers')}")
-
-    all_github = unified_profile["projects"].get("from_github", [])
-    print(f"\n  All GitHub Repos ({len(all_github)} total):")
-    for repo in all_github:
-        insights = repo.get("code_insights", {})
-        cq       = insights.get("code_quality", {})
-        rating   = cq.get("rating", "")
-        score    = cq.get("score", "")
-        insight_str = f" → {rating} ({score}/10)" if rating else ""
-        print(f"  • {repo['name']}{insight_str}")
-
-    code_analysis  = unified_profile.get("code_analysis", {})
-    repos_analyzed = code_analysis.get("repos_analyzed", 0)
-    print("\n🔍 CODE ANALYSIS")
-    if repos_analyzed == 0:
-        print("  ⚠️  No code analysis was run")
-    else:
-        print(f"  Repos analyzed : {repos_analyzed}")
-
-    print("\n🌐 PORTFOLIO")
-    if unified_profile["portfolio"].get("url"):
-        print(f"  URL : {unified_profile['portfolio']['url']}")
-    else:
-        print("  ❌ Not found")
-
-    print("\n📊 SOURCES USED")
-    for source, used in unified_profile["sources_used"].items():
-        status = "✅" if used else "❌"
-        print(f"  {status} {source.capitalize()}")
-
-    print("\n🔗 LINKS")
-    print(f"  GitHub    : {unified_profile['links'].get('github')    or 'Not found'}")
-    print(f"  Portfolio : {unified_profile['links'].get('portfolio') or 'Not found'}")
-    print(f"  LinkedIn  : {unified_profile['links'].get('linkedin')  or 'Not found'}")
-
-    print("\n" + "=" * 55)
-    print("  ✅ Saved → outputs/candidate_profile.json")
-    print("  ✅ Saved → MongoDB student_profiles")
-    print("  ✅ Ready for Agent 2")
-    print("=" * 55)
-
-# ─── Main Runner ──────────────────────────────────────────
-
-def run_agent1():
-    print("\n" + "=" * 55)
-    print("          AGENT 1 — PROFILE AGGREGATOR")
-    print("=" * 55)
-
-    # ── Step 1: Resume Input ──────────────────────────────
-    print("\n📄 STEP 1: Resume Input")
-    print("  1. Upload resume file (PDF/DOCX)")
-    print("  2. Paste resume text")
-    choice = input("\n  Enter 1 or 2: ").strip()
-
-    if choice == "1":
-        root = tk.Tk()
-        root.withdraw()
-        file_path = filedialog.askopenfilename(
-            title="Select Resume",
-            filetypes=[
-                ("PDF files",  "*.pdf"),
-                ("Word files", "*.docx")
-            ]
+        repos_raw = self._gh_get(
+            f"https://api.github.com/users/{username}/repos?per_page=100&sort=updated",
+            as_list=True
         )
-        if not file_path:
-            print("  No file selected. Exiting.")
-            return
+        print(f"  📦 Fetching metadata for {len(repos_raw)} repos...")
 
-        filename = os.path.basename(file_path)
-        with open(file_path, "rb") as f:
-            file_bytes = f.read()
-        resume_data = parse_resume(file_bytes, filename=filename)
+        repo_details = []
+        for repo in repos_raw:
+            name = repo["name"]
+            repo_details.append({
+                "name":           name,
+                "description":    repo.get("description") or "",
+                "languages":      self._get_languages(username, name),
+                "stars":          repo.get("stargazers_count", 0),
+                "forks":          repo.get("forks_count", 0),
+                "commit_count":   self._get_commit_count(username, name),
+                "last_updated":   repo.get("updated_at", ""),
+                "topics":         repo.get("topics", []),
+                "has_live_demo":  bool(repo.get("homepage")),
+                "homepage":       repo.get("homepage", ""),
+                "is_fork":        repo.get("fork", False),
+                "readme_preview": self._get_readme(username, name),
+                "code_samples":   {},
+                "code_insights":  {}
+            })
 
-    elif choice == "2":
-        print("\n  Paste resume text. Type 'END' when done:\n")
-        lines = []
-        while True:
-            line = input()
-            if line.strip() == "END":
-                break
-            lines.append(line)
-        resume_data = parse_resume("\n".join(lines))
-
-    else:
-        print("  Invalid choice. Exiting.")
-        return
-
-    print(f"\n  ✅ Resume parsed: {resume_data.get('name')}")
-
-    # ── Step 2: Build RAG + Extract Links ─────────────────
-    print("\n🔍 STEP 2: Building RAG vector store...")
-    collection   = build_vectorstore(resume_data)
-    github_url   = query_github_url(collection, resume_data)
-    linkedin_url = query_linkedin_url(collection, resume_data)
-
-    # ── Step 3: GitHub — Auto or Prompt ───────────────────
-    print("\n🐙 STEP 3: GitHub Sub-Agent")
-    github_data = {}
-
-    if github_url:
-        # ✅ Found — proceed immediately
-        print(f"  ✅ GitHub URL found: {github_url}")
-        github_data = scrape_github_profile(github_url)
-
-    else:
-        # ❌ Not found — ask user
-        print("  ⚠️  No GitHub URL found automatically")
-        github_url = prompt_for_link(
-            link_type="GitHub",
-            description=(
-                "No GitHub URL was found in your resume.\n"
-                "This may be because your GitHub link is a hyperlink\n"
-                "with display text only (e.g. 'GitHub' instead of the URL)."
-            )
+        # Code analysis — sequential, all non-fork repos
+        non_forks = sorted(
+            [r for r in repo_details if not r["is_fork"]],
+            key=lambda x: x["commit_count"], reverse=True
         )
+        print(f"  🔍 Fetching + analyzing all {len(non_forks)} repos sequentially...")
 
-        if github_url:
-            github_data = scrape_github_profile(github_url)
-        else:
-            print("  ⏭️  Skipping GitHub scraping — no URL provided")
+        repos_analyzed = 0
+        for i, r in enumerate(non_forks):
+            repo_name = r["name"]
+            print(f"  [{i+1}/{len(non_forks)}] {repo_name}")
 
-    # ── Step 4: Find Portfolio — Auto or Prompt ───────────
-    print("\n🔍 STEP 4: Finding Portfolio URL...")
-    portfolio_url = query_portfolio_url(collection, resume_data)
+            # Fetch code
+            _, code_samples = self._fetch_repo_code(username, repo_name)
+            if not code_samples:
+                print(f"    ⚠️  No code files found")
+                continue
 
-    if not portfolio_url:
-        print("  Not found in resume — checking GitHub repos...")
-        portfolio_url = extract_portfolio_from_github(github_data)
+            # Analyze with Gemini
+            insights = self._analyze_code(repo_name, code_samples)
 
-    if portfolio_url:
-        # ✅ Found — proceed immediately
-        print(f"  ✅ Portfolio URL found: {portfolio_url}")
+            # Store results
+            for repo in repo_details:
+                if repo["name"] == repo_name:
+                    repo["code_samples"]  = {k: v[:500] for k, v in code_samples.items()}
+                    repo["code_insights"] = insights
+                    if insights:
+                        repos_analyzed += 1
 
-    else:
-        # ❌ Not found — ask user
-        print("  ⚠️  No Portfolio URL found automatically")
-        portfolio_url = prompt_for_link(
-            link_type="Portfolio",
-            description=(
-                "No portfolio/personal website URL was found in your resume.\n"
-                "This may be because your portfolio link is a hyperlink\n"
-                "with display text only."
-            )
-        )
+            time.sleep(3)  # small delay between repos
 
-        if not portfolio_url:
-            print("  ⏭️  Skipping portfolio scraping — no URL provided")
+        # Aggregate
+        all_languages, all_skills, all_patterns, all_practices = [], [], [], []
+        for repo in repo_details:
+            all_languages += repo["languages"]
+            ins = repo.get("code_insights", {})
+            all_skills    += ins.get("skills_demonstrated", [])
+            all_patterns  += ins.get("architecture_patterns", [])
+            all_practices += ins.get("best_practices_used", [])
 
-    # ── Step 5: Scrape Portfolio ──────────────────────────
-    print("\n🌐 STEP 5: Portfolio Sub-Agent")
-    portfolio_data = {}
-    if portfolio_url:
-        print(f"  🚀 Starting portfolio scraping...")
-        portfolio_data = scrape_portfolio(portfolio_url)
-    else:
-        print("  ⏭️  No portfolio URL — skipping")
+        all_languages = list(set(all_languages))
+        top_repos     = sorted(repo_details, key=lambda x: x["stars"], reverse=True)[:5]
+        final_assessment = self._assess_developer(repo_details, all_skills, all_languages)
 
-    # ── Step 6: Merge All Sources ─────────────────────────
-    print("\n🔀 STEP 6: Merging all sources...")
-    unified_profile = merge_profiles(
-        resume_data,
-        github_data,
-        portfolio_data
-    )
-    print("  ✅ Profile merged!")
+        print(f"  ✅ GitHub done — {len(repo_details)} repos, {repos_analyzed} analyzed")
 
-    # ── Step 7: Save to JSON + MongoDB ───────────────────
-    print("\n💾 STEP 7: Saving outputs...")
+        return {
+            "candidate_profile": {
+                "github": {
+                    "username":     username,
+                    "name":         profile.get("name", ""),
+                    "bio":          profile.get("bio", ""),
+                    "location":     profile.get("location", ""),
+                    "email":        profile.get("email", ""),
+                    "website":      profile.get("blog", ""),
+                    "followers":    profile.get("followers", 0),
+                    "following":    profile.get("following", 0),
+                    "public_repos": public_repos,
+                    "github_url":   f"https://github.com/{username}",
+                }
+            },
+            "skills_summary": {
+                "all_languages":         all_languages,
+                "skills_from_code":      list(set(all_skills)),
+                "architecture_patterns": list(set(all_patterns)),
+                "best_practices":        list(set(all_practices)),
+            },
+            "repository_summary": {
+                "total_repositories":    len(repo_details),
+                "analyzed_repositories": repos_analyzed,
+                "top_repositories": [
+                    {"name": r["name"], "stars": r["stars"],
+                     "languages": r["languages"], "description": r["description"]}
+                    for r in top_repos
+                ],
+            },
+            "repositories":     repo_details,
+            "final_assessment": final_assessment,
+        }
 
-    # Save JSON locally
-    os.makedirs("outputs", exist_ok=True)
-    with open("outputs/candidate_profile.json", "w") as f:
-        json.dump(unified_profile, f, indent=2)
-    print("  ✅ Saved → outputs/candidate_profile.json")
+    # =========================================================================
+    # SECTION 3 — GEMINI HELPER
+    # =========================================================================
 
-    # Save to MongoDB
-    print("\n  📦 Saving to MongoDB...")
-    try:
-        db = get_db()
-        create_collections(db)
-        profile_id = save_student_profile(unified_profile)
-        print(f"  ✅ Saved to MongoDB → profile ID: {profile_id}")
-    except Exception as e:
-        print(f"  ⚠️  MongoDB save failed: {e}")
-        print(f"  ⚠️  Profile still saved locally as JSON")
+    def _gemini_json(self, prompt):
+        """Uses GEMINI_API_KEY — for resume parsing + portfolio + developer assessment"""
+        return self._call_gemini(self.gemini, prompt)
 
-    # ── Step 8: Print Summary ─────────────────────────────
-    print_summary(unified_profile, portfolio_url)
+    def _code_gemini_json(self, prompt):
+        """Uses GEMINI_CODE_KEY — for GitHub code analysis only"""
+        return self._call_gemini(self.code_gemini, prompt)
 
-    return unified_profile
+    def _call_gemini(self, client, prompt):
+        """Shared Gemini caller — used by both _gemini_json and _code_gemini_json"""
+        def repair_json(text):
+            text = text.strip()
+            last_valid = max(text.rfind(','), text.rfind('}'), text.rfind(']'))
+            if last_valid > 0:
+                text = text[:last_valid]
+            open_braces   = text.count('{') - text.count('}')
+            open_brackets = text.count('[') - text.count(']')
+            text += ']' * open_brackets
+            text += '}' * open_braces
+            return text
+
+        for model in self.MODELS:
+            for attempt in range(3):
+                try:
+                    response = client.models.generate_content(
+                        model=model, contents=prompt
+                    )
+                    raw = response.text.strip()
+                    raw = raw.replace("```json", "").replace("```", "").strip()
+                    try:
+                        return json.loads(raw)
+                    except json.JSONDecodeError:
+                        print(f"  JSON truncated from {model}, attempting repair...")
+                        return json.loads(repair_json(raw))
+                except json.JSONDecodeError as e:
+                    print(f"  JSON parse error from {model} even after repair: {e}")
+                    break
+                except Exception as e:
+                    if "429" in str(e):
+                        print(f"  {model} quota hit — waiting 30s...")
+                        time.sleep(30)
+                        continue
+                    print(f"  {model} failed: {e}")
+                    break
+        return {}
+
+    # =========================================================================
+    # SECTION 4 — MAIN ENTRY POINT
+    # =========================================================================
+
+    def run(self, file_bytes, filename):
+        resume_data = self.parse_resume(file_bytes, filename)
+        github_url  = resume_data.get("github_url", "")
+        github_data = self.scrape_github(github_url) if github_url else {}
+        return {"resume": resume_data, "github": github_data}
 
 
+# ── CLI ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    run_agent1()
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python agent1.py resume.pdf")
+        sys.exit(1)
+    with open(sys.argv[1], "rb") as f:
+        data = f.read()
+    result = Agent1().run(data, os.path.basename(sys.argv[1]))
+    print(json.dumps(result, indent=2))
